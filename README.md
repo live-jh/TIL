@@ -1,7 +1,7 @@
 # TIL (Today I Learned)
 학습한 내용을 기록하는 저장소입니다. 📝
 
----
+<br>
 
 ## Rules
 
@@ -20,6 +20,3 @@
 \- Done is better than perfect
 
 \- Just here
-
----
-
