@@ -37,6 +37,8 @@ console.log(a) // ReferenceError -> 전역 스코프에 a 선언시 값이 할�
 
 let은 재할당이 필요할 때 const는 상수일 때 사용하는 것이 좋습니다. (보통 const는 객체를 사용할 때 가장 유용합니다.)
 
+` 상황에 따라 다르지만 최대한 프론트단에선 const 선언을 우선으로 두고 작업하는 것이 효율성이 좋습니다`
+
 ```javascript
 let funcs = []
 for (let i = 0; i < 10; i++) {
