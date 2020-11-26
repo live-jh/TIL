@@ -82,6 +82,22 @@ const arr_2 = arr_1.reduce(function (v, i, arr) {
   - currentIndex: 현재 인덱스
   - originalArray: 원본 배열
 
+## 3-1. rest parameter
+
+어떤 함수를 호출했을때의 매개변수에서 지정하지 않은 나머지 파라미터를 말한다.
+
+```javascript
+function demo (...param3) {
+	console.log(param3) //[1, 30, false, null, undefined, true]
+}
+demo(1, 30, false, null, undefined, true) 
+
+function demo2 (i, j, ...param) {
+  console.log(param) //[null, undefined, true]
+}
+demo2(-2, 10, null, undefined, true) 
+```
+
 
 
 <br>
