@@ -93,18 +93,17 @@ print(a[0:2])  # 	[1,2]
 
 ```python
 arr = [i for i in range(5)] # 0부터 4까지 반복하며 i를 배열에 담아 return
-
 print(arr) # [0,1,2,3,4]
 
 arr2 = [i for i in range(10) if i % 2 == 1] # 0부터 9까지 반복하며 i가 2로 나누었을때 1이 나머지로 떨어지는 i만 return (홀수만)
-
 print(arr2)
 
 arr3 = [i * i for i in range(1,10)] #값의 제곱을 리턴하기
-
 print(arr3)
 
-arr4 = [[0]] * m for _ in range(n)]
+n, m = 5, 3 # 5번 반복 1개의 배열의 3개 데이터
+arr4 = [[0] * m for _ in range(n)] #[[0,0,0], [0,0,0]...]
+print(arr4)
 ```
 
 
@@ -113,4 +112,4 @@ arr4 = [[0]] * m for _ in range(n)]
 
 ## References
 
-- 
+- https://www.youtube.com/watch?v=m-9pAwq1o3w
