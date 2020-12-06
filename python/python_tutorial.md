@@ -118,6 +118,37 @@ print(arr4) #[[0,0,0], [0,0,0]...]
 | count()   | 변수명.count(값)              | 특정 값을 가지는 데이터 갯수                   | O(_N_)     |
 | remove()  | 변수명.remove(값)             | 특정 값을 갖는 원소 제거시 (1개 제거)          | O(_N_)     |
 
+**특정 값 원소 제거**
+
+```python
+a = [1,2,3,4,5,6,6,7,10]
+remove_set = [5,6,10]
+
+# remove_set에 있는 것 지우기
+# 순차적으로 작성하기 -> i return, a를 반복적으로 돌면서 a의 데이터가 if remove_set not in일 때 표기
+result = [i for i in a if i not in remove_set]
+print(result) #[1, 2, 3, 4, 7]
+
+```
+
+## 3. 문자열
+
+- 문자열 변수에 `+` 를 사용시 문자열이 더해져서 표시
+- `\` 백슬래시 사용으로 큰따옴표, 작은따옴표 사용 가능
+- 리스트와 마찬가지로 인덱싱과 슬라이싱을 사용가능하지만 변경할 수 없다. (Immutable)
+
+```python
+str = "Hello world! \"python\" is good"
+print(str) #Hello word! "python" is good
+
+#인덱싱 사용 가능
+print(str[0:4])
+
+#변경불가
+str[0] = 'T' # TypeError: 'str' object does not support item assignment
+
+```
+
 
 
 <br>
