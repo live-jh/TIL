@@ -149,6 +149,112 @@ str[0] = 'T' # TypeError: 'str' object does not support item assignment
 
 ```
 
+## 4. 튜플 자료형
+
+리스트와 비슷한 자료형으로 한번 선언된 값을 변경할 수 없습니다. 표기는 `()` 를 사용하며 리스트에 비해 적은 메모리를 사용하여 조금 더 효율적입니다. 튜플을 사용하기 좋은 경우는 다른 성질의 데이터를 관리할때이며 최단경우 알고리즘에서 자주 사용합니다. 또한 데이터의 묶음을 해싱의 키값을 사용하거나 메모리를 효율적으로 사용해야하는 경우도 쓰기 좋습니다.
+
+### 4-1. map 내장함수
+
+파이썬 내장함수는 반복적으로 여러 데이터를 한번에 다른 형태로 변환할 때 사용합니다. 여러 데이터가 담긴 리스트와 튜플에 자주 사용되며 문법과 의미는 아래 코드와 같습니다.
+
+```python
+# 리스트와 튜플 응용하기
+list(map(변환 함수, 리스트))
+tuple(map(변환 함수, 튜플))
+
+# ex -> 실수리스트를 정수리스트로 변환
+a = [1.2, 3.4, 5.7, 1.8]
+for i in range(len(a)):
+  a[i] = int(a[i])
+print(a) #[1, 3, 5, 1]
+
+#map 내장함수로 실수리스트를 정수리스트로 변환
+a = list(map(int, a))
+print(a) #[1, 3, 5, 1]
+
+b = list(map(str, range(5)))
+print(b) ['0','1','2','3','4']
+
+#여러 숫자 데이터 입력 받을때 int 형변환시 map으로 변환 후 list로 감싸기
+data = list(map(int, input.split())) # 30 10 8
+print(data) #[30, 10, 8]
+```
+
+## 5. 사전 자료형 (dictionary)
+
+키 : 값 `({key : value})` 의 쌍을 하나의 데이터로 가지는 자료형을 말합니다. 딕셔너리라고도 부르며 해시테이블을 사용해서 조회 및 수정 작업에서는 `O(1)` 시간복잡도를 가집니다.
+
+```python
+team = dict()
+team['eng'] = 'chelsea'
+team['fra'] = 'paris'
+
+print(team)
+
+list(team.keys()) #키 데이터만 담은 리스트
+list(team.values()) #값 데이터만 담은 리스트
+
+for data in team:
+  print(team[data]) #chelsea paris
+```
+
+## 6. 집합 자료형 (set)
+
+집합자료형은 중복을 허용하지 않으며, 순서(인덱싱)이 존재하지 않습니다. 리스트나 문자열을  `set()` 함수를 사용하여 초기화할 수 있으며 사전자료형과 마찬가지로 조회 및 수정작업에서 `O(1)` 시간으로 처리할 수 있습니다.
+
+```python
+set_1 = set([1,2,3])
+l1 = list(set_1)
+print(l1) #[1,2,3]
+```
+
+만약 set 자료형에 인덱싱을 사용해 접근하려면 위에 코드와 같이 리스트나 튜플함수를 이용해 변환하여 사용해야 합니다.
+
+### 6-1. 교집합 & 합집합 & 차집합
+
+```python
+#교집합
+set_1 = set([1,2,3])
+set_2 = set([3,4,5])
+result = set_1&set_2 # or  set_1.intersection(set_2)
+print(result) #{3}
+
+#합집합
+result2 = set_1 | set_2 # or set_1.union(set_2)
+print(result2) #{1, 2, 3, 4, 5}
+
+#차집합
+result3 = set_1 - set_2 # or set_1.difference(set_2)
+print(result3) #{1, 2}
+
+```
+
+### 6-2. 집합 자료형 관련 함수
+
+**add(값 1개 추가)**
+
+```python
+set_1 = set([1,2,3])
+set_1.add(5)
+print(set_1) #{1,2,3,5}
+```
+
+**update(값 여러개 추가)** 
+
+```python
+set_1 = set([1,2,3])
+set_1.update([31,32,34])
+print(set_1) #{1,2,3,31,32,34}
+```
+
+**remove(특정값 제거)**
+
+```python
+set_1 = set([1,2,3])
+set_1.remove(3)
+print(set_1) #{1,2}
+```
+
 
 
 <br>
