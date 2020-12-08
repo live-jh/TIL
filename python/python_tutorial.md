@@ -255,6 +255,47 @@ set_1.remove(3)
 print(set_1) #{1,2}
 ```
 
+## 7. 빠르게 입력받기
+
+파이썬의 경우 빠르게 입력받아야 할 때 sys라이브러리에 `sys.stdin.readline()` 을 사용하용할 수 있습니다. 엔터를 누를시 줄바꿈 기호로 입력되므로 `rstrip()` 함수를 함께 사용하는걸 권장합니다.
+
+```python
+data = sys.stdin.readline().rstrip()
+print(data)
+```
+
+## 8. f-string
+
+파이썬 버전 3.6부터 사용 가능하며 자바스크립트의 template literals과 비슷한 기능으로 문자열과 변수를 함께 사용하는 문법을 말합니다.
+
+```python
+number = 5
+print(f"평일은 {5}일입니다.")
+```
+
+##  9. 람다 표현식
+
+어떤 기능을 하는 함수를 한줄에 작성할 수 있는 장점을 가지고 있습니다.
+
+```python
+def add(a, b): return a + b
+
+print(add(2,5)) #7
+
+#람다 표현식
+print((lambda a, b: a + b)(2,5)) #7
+
+#2번째 데이터 숫자로 정렬하기
+array = [('soccer', 11), ('basketball', 5), ('boxing', 1)]
+print(sorted(array, key=lambda x:x[1])) #[('boxing', 1), ('basketball', 5), ('soccer', 11)]
+
+#여러 리스트 
+list_1 = [1,3,5,7,9]
+list_2 = [2,4,5,6,8]
+print(list(map(lambda a, b: a + b, list_1, list_2)) #[3, 7, 10, 13, 17]
+
+```
+
 
 
 <br>
