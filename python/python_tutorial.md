@@ -296,6 +296,53 @@ print(list(map(lambda a, b: a + b, list_1, list_2)) #[3, 7, 10, 13, 17]
 
 ```
 
+## 10. 표준 라이브러리
+
+### 10-1. 내장함수
+
+`sum(), min(), eval(), print(), input(), sorted()` 등의 기본 내장 라이브러리 함수를 말합니다.
+
+### 10-2. itertools
+
+반복형태의 데이터를 처리할 수 있도록 도와주는 라이브러리로 순열&조합 기능을 제공합니다.
+
+### 10-3. heapq
+
+힙 기능과 우선순위 큐 기능을 제공하는 라이브러리입니다.
+
+### 10-4. bisect
+
+이진 탐색 기능을 제공하는 라이브러리입니다.
+
+### 10-5. collections
+
+카운터, 덱등 자주 사용되는 자료구조를 포함하고 있는 라이브러리입니다.
+
+## 11. 순열과 조합
+
+순열 : 서로 다른 n개에서 서로 다른 r개를 선택해 나열하는 것을 말합니다. 쉽게 말해 주어진 데이터에서 선택한 데이터의 중복되지 않는 각 조합을 구하는 것을 말합니다.
+
+```python
+from itertools import permutations
+
+data = ['E',"I","S","N"]
+
+result = list(permutations(data,2))
+print(result)
+#'N'), ('S', 'E'), ('S', 'I'), ('S', 'N'), ('N', 'E'), ('N', 'I'), ('N', 'S')]
+```
+
+조합: 서로 다른 n개에서 순서 관계 없이 다른 데이터 r개를 선택하는 것을 말합니다.
+
+```python
+from itertools import combinations
+
+data = ['E',"I"]
+
+result = list(combinations(data,2))
+print(result) #[('E', 'I')] permutations는 E,I / I,E
+```
+
 
 
 <br>
