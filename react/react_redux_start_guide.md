@@ -61,30 +61,12 @@ local state는 각 컴포넌트가 가지는 state로 각각의 애플리케이�
 
 **components**
 
-- board
-  - Post.js (게시글 하나의 row -> 프레젠테이션(하위) 컴포넌트)
-- todo
-  - Todo.js
-  - Dashboard.js
-
 **containers**
-
-- board
-  - PostList.js (게시글 리스트 -> 컨테이너(상위) 컴포넌트)
-  - PostForm.js (글 작성, 조회 form)
-- todo
-  - TodoList.js
-  - TodoForm.js
 
 **modules**
 
-- index.js
-- board
-  - actions -> index.js (액션 정의)
-  - reducers -> 액션에 따른 상태 변경 객체를 반환하는 reducer 작성
-- todo
-  - actions -> index.js (액션 정의)
-  - reducers -> 액션에 따른 상태 변경 객체를 반환하는 reducer 작성
+- actions -> index.js (액션 정의)
+- reducers -> 액션에 따른 상태 변경 객체를 반환하는 reducer 작성
 
 **store**
 
