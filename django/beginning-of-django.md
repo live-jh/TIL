@@ -160,3 +160,19 @@ N쪽인 관계에서 선언하며 두개의 파라미터가 필요하다 (대상
 - ManyToManyField, ForeignKey의 reverse relation 에서 활용
 - 각 관계 별로 DB 쿼리를 수행하고, 파이썬 단에서 조인을 수행한다.
 - prefetch_related는 조인하지 않고 개별 쿼리를 실행한 후에 장고가 직접 데이터를 조합한다.
+
+### Django - Serializing multiple objects
+
+다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
+
+```python
+book_set = Book.objects.all()
+serializer = BookSerializer(book_set, many=True)
+
+print(serializer.data)
+# [
+	{'id': 1, 'title': '콩쥐팥쥐', 'author': '동화'},
+	{'id': 2, 'title': '신데렐라', 'author': '동화'}
+]
+```
+

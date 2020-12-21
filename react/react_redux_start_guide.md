@@ -70,7 +70,47 @@ local state는 각 컴포넌트가 가지는 state로 각각의 애플리케이�
 
 **store**
 
-- Index.js
+<br>
+
+### 2-3. react - redux
+
+redux는 상태관리하는 전용 장소(store)에서 상태관리하고 컴포넌트는 그것을 보여주는 용도로만 사용
+
+![스크린샷 2020-12-21 오후 2 04 05](https://user-images.githubusercontent.com/48043799/102741338-76f6b580-4395-11eb-9bee-d3ec24e74e4f.png)
+
+
+
+Store에 접근하려면 action을 통해 접근 (이벤트와 같은 개념)
+
+1. store에 무엇인가 하고 싶은 경우 action을 발행
+
+2. store의 문지기가 action 발생을 감지시 state 갱신
+
+3. action의 포맷은 아래와 같은 obj
+
+   1. `{type: "action의 식별 문자열", payload: "액션 실행에 필요한 임의 데이터"}`
+   2. 상수 - `export const ADD_VALUE = '@@myapp/ADD_VALUE';`
+      함수 - `export const addValue = amount => ({type: ADD_VALUE, payload: amount});`
+
+4. reducer는 이전 상태 action을 합쳐 new state를 만드는 조작
+
+   1. **초기상태는 Reducer의 디폴트 인수에서 정의된다**
+
+   2. 상태가 변할 때 전해진 state는 그 자체 값으로 대체되는 것이 아니라 새로운 것에 합성되는 개념으로 쓰인다.
+
+   3. 
+
+      ```
+      import { ADD_VALUE } from './actions';
+      export default (state = {value: 0}, action) => {
+      	switch (action.type) {
+      		case ADD_VALUE:
+      			return {...state, value: state.value + action.payload};
+      	}
+      }
+      ```
+
+
 
 <br>
 
