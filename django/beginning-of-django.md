@@ -1,4 +1,4 @@
-# 장고를 시작할 때 알아두면 좋은 개념
+# 장고를 시작할 때 알아두면 좋은 개념 - Models
 
 
 
@@ -45,6 +45,8 @@ class Post(models.Model):
 
 1. 모델 작성 후 terminal에서 `python manage.py makemigrations`
 2. `python manage.py migrate`
+   1. 그외 migrate 명령어
+      1. `python manage.py showmigrations 앱이름` -> migrations 리스트 보기 (전체 보고 싶을땐 앱 이름 제거)
 3. Admin.py에 모델 등록
 
 ```python
@@ -67,6 +69,7 @@ admin.site.register(Post) #생성한 Post 모델 admin에 등록
 - FileField
 - ImageField
 - TextField
+- 그외 EmailField, URLField, UUIDField 등
 
 **Relation ship Types**
 
@@ -74,7 +77,12 @@ admin.site.register(Post) #생성한 Post 모델 admin에 등록
 - ManyToManyField
 - OneToOneField
 
+### 파이썬데이터타입과 DB 데이터 타입 매핑
 
+- AutoField -> int
+- BinaryField -> bytes
+- BooleanField -> bool
+- CharField/URLField/EmailField -> str
 
 ## 주요 필드 옵션
 
@@ -108,6 +116,14 @@ admin.site.register(Post) #생성한 Post 모델 admin에 등록
 
 
 
+## DB 설계시 TIP
+
+- 설계한 DB 구조에 따라 다르지만 최대한 필드타입을 타이트하게 지정해주기(입력값의 오류 방지 및 성능 최적화)
+- blank/null 지정은 최소화
+- validators를 추가로 지정하기
+  - **프론트엔드**의 유효성검사는 **사용자 편의**, **백엔드** 유효성 검사는 **필수**
+  - 직접 유효성 로직은 최대한 만들지 않기 -> 장고 Form, Serializer를 사용하기
+
 ## 클래스 메타 옵션
 
 ### db_table
@@ -121,7 +137,61 @@ admin.site.register(Post) #생성한 Post 모델 admin에 등록
 - False 일때 모델에 대한 db 작성, 삭제 수행되지 않음(기존테이블로 운용시)
 - False 옵션일때 모델이 ManyTomanyField를 가리키는 경우 다 대 다 조인에 대한 중간 테이블이 작성되지 않음
 
+### DB 테이블명
 
+default: 앱이름_모델명
+
+ex) Blog App -> Post Model 시 표기 : blog_post
+
+
+
+## 모델 클래스 설정
+
+### Admin 등록하기
+
+해당 앱/admin.py에 다음과 같이 작성한다.
+
+- `admin.site.register(앱이름)`
+
+### 모델 클래스 __str__
+
+admin 모델 리스트에서 "모델명 obj"를 원하는 대로 변경 (java의 toString()과 유사 역할)
+
+```python
+def __str__(self):
+	return f"<{self.pk}> {self.message}"
+```
+
+### list_display 속성
+
+모델 리스트에 출력할 컬럼들을 지정한다.
+
+```python
+@admin.register(Post)  # 래핑
+class PostAdmin(admin.ModelAdmin):  # 3번 방법
+    list_display = ['pk', 'message', 'created_at', 'updated_at']
+    pass
+```
+
+![image](https://user-images.githubusercontent.com/48043799/102789542-a33b2200-43e7-11eb-8107-e69b6485f349.png)
+
+> 위에 list_display에 지정한 필드로 admin에 노출된다.
+
+
+
+## 파이썬 쉘에서 쿼리 확인하기
+
+터미널에서 명령어 입력
+
+- `python manage.py shell`
+
+- 확인하고자 하는 Model import
+
+  - `from user.models import Profile`
+  - `qs = Profile.objects.all()`
+  - `print(qs.query)`
+
+  
 
 ## 관계 표현 모델필드
 
@@ -141,7 +211,7 @@ N쪽인 관계에서 선언하며 두개의 파라미터가 필요하다 (대상
 
 ### ManyToManyField
 
-다대다 관계를 의미,  여러개의 글과 여러 태그등이 대표적인 예
+다대다 관계를 의미,  하나의 글엔 여러개의 태그가 있고 하나의 태그가 여러개의 글에 쓰일 수 있는 것이 대표적인 예 
 
 관계를 선언시 어느쪽에서 하던 상관없으며 위에 있는 모델에서 지정시 하위 테이블을 문자열로 표현, 태그를 지정 안할 시를 고려해 blank=True
 
@@ -161,7 +231,119 @@ N쪽인 관계에서 선언하며 두개의 파라미터가 필요하다 (대상
 - 각 관계 별로 DB 쿼리를 수행하고, 파이썬 단에서 조인을 수행한다.
 - prefetch_related는 조인하지 않고 개별 쿼리를 실행한 후에 장고가 직접 데이터를 조합한다.
 
-### Django - Serializing multiple objects
+## Static 파일 & Media 파일
+
+### static 파일
+
+개발 리소스로서 정적 파일(js, css, img)
+
+앱 또는 프로젝트 단위로 저장
+
+### media 파일
+
+FileField/ImageField를 통해 저장한 모든 파일들
+
+DB필드엔 저장 경로(url)를 저장하며 파일은 파일 스토리지(S3)에 저장
+
+ImageField를 사용할 때 사용하는 `pip install pillow (이미지 라이브러리)`
+
+### media 파일 처리 순서
+
+1. HttpRequest.FILES 를 통해 파일 전달
+2. View, Form 로직을 통해 유효성 검증을 수행 후 경로를 저정한다
+3. settings.MEDIA_URL에 저장
+
+```python
+#django project settings.py
+
+MEDIA_URL = '/media/' #파일 url 접근시 사용 설정
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') #업로드시 사용되는 설정
+
+
+#urls.py
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+### upload_to 옵션 (디렉토리 지정하는 옵션)
+
+default: 파일명 그대로 settings.MEDIA_ROOT에 저장
+
+settings.MEDIA_ROOT 하위에서 지정한한 파일, 경로명 지정(함수 또는 문자열로 지정 가능)
+
+문자열인 경우는 저장할 디렉토리를 작성, 함수일 경우 return값은 저장할 경로의 `문자열로 반환하며 파일명까지 변경`할 수 있다.
+
+`upload_to="instagram/post/%Y/%m%d"` -> instagram/post/2020/12/22/파일명으로 저장
+
+
+
+## Model Manager
+
+DB 인터페이스를 제공 default Manager로 ModelCls.objects가 제공합니다.
+
+query_set은 lazy한 특징을 가지고 있습니다.
+
+아래와 같이 orm을 활용해 쿼리셋을 작성하더라도 준비만 하고 있을 뿐 실제로 쿼리를 실행하지는 않습니다. 실행하는 시점은 해당 쿼리 결과를 사용할 때 즉 출력이 필요한 순간에 동작하게 됩니다.
+
+```python
+#DB 접근 전
+qs = Post.objects.all().order_by('-id')[:2] 
+
+#DB 접근 상황 (그외 -> list(query_set), for in query, print등)
+for post in qs:
+	print("id: {id}, message: {message}, created_at: ({created_at})".format(**post.__dict__))
+
+#id: 4, message: 첫번째 메세지, created_at: 2020-12-21 15:19:57.925964+00:00
+#id: 5, message: 두번째 메세지, created_at: 2020-12-21 15:20:02.017573+00:00
+#id: 6, message: 세번째 메세지, created_at: 2020-12-21 15:20:07.441932+00:00
+
+```
+
+## QuerySet Chaining
+
+```python
+#__icontains == '%like%'
+#order_by '-' = desc
+
+qs = Post.objects.all()\ #\표시로 줄바꿈 가능
+		.filter(message__icontains = "첫번째")\
+		.order_by('')
+    
+```
+
+## QuerySet get
+
+````python
+qs = Post.objects.all()
+# 쿼리셋의 결과 object가 1개만 원할때 get을 사용 (id를 통한 검색)
+qs.get(id=2)
+qs.get(id__lte=3) #error 
+#less than, less than equal(작거나 같다)
+# greater than, greater than equal(크거나 같다)
+
+````
+
+## QuerySet filter - exclude & or & and
+
+```python
+#필드명 = 조건값
+#1개 이상의 인자 지정 -> 모두 and 조건으로 묶인다.
+# or 조건으로 묶으려면 django.db.models.Q를 사용
+#filter의 반대는 exclude(not)
+qs = Post.objects.all().filter(message__icontains="메세지", id__lt=6)
+print(qs) #<QuerySet [<Post: 첫번째 메세지>, <Post: 두번째 메세지>]>
+
+# or => Q
+qs = Post.objects.all()
+cond = Q(id__gte=6) | Q(message__icontains='두')
+qs = qs.filter(cond)
+print(qs) #<QuerySet [<Post: 두번째 메세지>, <Post: 세번째 메세지>]>
+
+```
+
+
+
+## Django - Serializing multiple objects
 
 다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
 
