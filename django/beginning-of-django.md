@@ -343,6 +343,33 @@ print(qs) #<QuerySet [<Post: 두번째 메세지>, <Post: 세번째 메세지>]>
 
 
 
+## 정렬 조건
+
+DB 자체적으로 다수 필드에 대한 정렬을 지원하지만 가급적 **단일 필드**로 적용하는 것이 성능에 효율적입니다.
+
+### 방법
+
+1. Model class의 Meta 속성으로 order 설정(list 지정) -> **추천**
+   1. 기본정렬 이후 query_set에 order_by 정렬을 사용하면 기본 정렬은 무시됩니다.
+2. query_set에 order_by 조건 추가
+
+
+
+## 슬라이싱
+
+str, list, tuple의 슬라이싱과 비슷한 개념이지만 역순은 지원하지 않습니다. 역순을 알고 싶을때는 정렬을 반대로 지정 후 앞에 2개를 가져오는 방식으로 진행합니다.
+
+`객체[start:stop:step]` step은 쿼리에 대응 x, 사용하지 않는다.
+
+```python
+Post.objects.all()[:2] # 앞에서 2개
+Post.objects.all().order_by('-id')[:2] # 뒤에 2개
+```
+
+step 값을 지정하는 순간 리스트로 변경되기 때문에 lazy한 특징은 사라집니다. 즉 orm으로 쿼리셋을 작성하는 것만으로도 쿼리 요청을 보내는 것이니 이점은 참고해야 합니다.
+
+
+
 ## Django - Serializing multiple objects
 
 다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
