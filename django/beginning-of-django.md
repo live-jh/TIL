@@ -370,6 +370,41 @@ step 값을 지정하는 순간 리스트로 변경되기 때문에 lazy한 특
 
 
 
+## 디버그 툴바
+
+디버그 툴바는 **body태그**가 존재해야 기능이 정상적으로 동작합니다.
+
+### root_url.py
+
+```python
+if settings.DEBUG:
+	import debug_toolbar
+	urlpatterns += [
+  	  path('__debug__/', include(debug_toolbar.urls))
+	]
+```
+
+### settings.py
+
+```python
+MEDDLEWARE = [
+	'debug_toolbar.middleware.DebugToolbarMiddleware' # 추가
+]
+INSTALLED_APPS = [
+	'debug_toolbar', # 추가
+]
+
+INTERNAL_IPS = ['127.0.0.1']
+```
+
+![스크린샷 2020-12-24 오전 12 00 36](https://user-images.githubusercontent.com/48043799/103010105-188b2c00-457b-11eb-8035-200f2d8dba09.png)
+
+> 적용된 모습 :)
+>
+> 실서버에서는 False!
+
+SQL 실행 내역을 개발서버 콘솔 표준으로 출력(ajax 내역 포함)하는 기능을 사용하고 싶으면 `django-querycount`
+
 ## Django - Serializing multiple objects
 
 다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
