@@ -405,6 +405,43 @@ INTERNAL_IPS = ['127.0.0.1']
 
 SQL 실행 내역을 개발서버 콘솔 표준으로 출력(ajax 내역 포함)하는 기능을 사용하고 싶으면 `django-querycount`
 
+## RDBMS의 관계
+
+### 1:N 관계
+
+models.ForeignKey로 표현
+
+- 1명의 사용자가 쓰는 다수의 글
+- 1명의 사용자가 쓰는 다수의 댓글
+- 1개의 글의 다수의 댓글
+
+### 1:1 관계
+
+models.OneToOneField로 표현
+
+- 1명의 사용자가 가지는 1개의 profile 테이블
+
+### M:N 관계
+
+models.ManyToManyField로 표현
+
+- 1개의 글에 다수의 태그형식 묶음 (1개 태그는 다수의 포스팅에 쓰임)
+
+### ForeignKey
+
+- 1:N 관계에서 N측에 명시
+  - Post(글) - **Comment(댓글)** 관계에서 **댓글**에다가 명시
+- to: 대상 모델 (클래스를 직접 입력하거나, 문자열로 지정, 자기 자신 참조는. "self")
+- on_delete: 레코드 데이터 삭제시 룰
+  - casecade: fk로 참조되는 모델의 데이터도 삭제
+  - project: protectedError를 발생시키며 삭제 방지
+  - set_null : default null (null=True 필수)
+  - set_default: default값으로 대체
+  - set: 대체할 값이나 함수 지정, 호출시 리턴값 사용
+  - do_nothing: 어떠한 액션도 지정하지 않음
+
+
+
 ## Django - Serializing multiple objects
 
 다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
