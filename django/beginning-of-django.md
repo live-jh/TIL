@@ -442,6 +442,108 @@ models.ManyToManyField로 표현
 
 
 
+## 역참조와 정참조
+
+### 정참조
+
+user와 post가 있을 때 관계는 1:N
+
+여기서 N.objects.get 또는 N.objects.filter 또는 N.objects.all등으로 post(N) 인스턴스에 user(1) 정보를 참조시 정참조라 말합니다.
+
+##### 표기법
+
+`post.user.id (여기서 user는 post가 정참조하고 있는 테이블명을 가리키며 소문자로 표기한다.)`
+
+### 역참조
+
+user와 post의 관계는 1:N
+
+1.objects.get 또는 1.objects.filter 또는 1.objects.all등으로 user(1) 인스턴스에 post(N) 정보를 참조시 역참조라 말합니다. (post는 하위 모델로 user라는 상위 모델을 참조하고 있는데 user에서 post를 접근하는 방식이다보니 역참조라 부릅니다.)
+
+##### 표기법
+
+`user.post_set.all() (여기서 역참조하는 모델 "테이블명_set"으로 접근하기)`
+
+
+
+## FK의 reverse_name
+
+상속관계(reverse) 접근시 속성명의 기본값은 `모델명의 소문자_set` 으로 접근합니다.
+
+```python
+from django.db import models
+
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+
+ class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)  # "instagram.Post"
+    message = models.TextField()
+    
+
+# 하위 모델에서 상위 모델 접근시(정참조) comment.post
+# 상위 모델에서 하위 모델 접근시(역참조) post.comment_set <=> Comment.objects.filter(post=post)
+
+Comment.objects.filter(post_id=4) #직접적인 필드명 조건
+Comment.objects.filter(post__id=4) #관계가 맺어져 있는 post테이블의 id(pk)
+Comment.objects.filter(post=post) #*추천 참조와 인스턴스 비교
+
+post.comment_set.all() #역참조 외래키 reverse_name 
+```
+
+reverse_name 기본 이름은 모델명만 고려하기에 충돌이 발생할 수도 있습니다.
+
+예를 들어 board앱의 post모델의 account, blog앱의 post모델의 account이 있을때 makemigrations를 실패하게 됩니다. 이럴 경우 특정 한쪽의 FK의 reverse_name을 지정하지 않는 형식으로 구성하거나 충돌나는 두 FK 모두 변경하거나 하는 방법이 있습니다.
+
+구성 -> `related_name = '+'`
+
+
+
+## ForeignKey.limit_choices_to 옵션
+
+Form을 통한 choice 위젯 선택 옵션, dict/Q 객체 또는 객체를 리턴하는 함수 지정 가능합니다.
+
+```python
+# Create your models here.
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_public = models.BooleanField(default=False, verbose_name="공개여부")
+    
+ class Comment(models.Model):
+    post = models.ForeignKey(
+      Post, 
+      on_delete=models.CASCADE,
+    	limit_choices_to = {'is_public': True})  #참조하고 있는 테이블의 조건 걸기
+    message = models.TextField()
+```
+
+
+
+## OneToOneField 
+
+1:1 관계 양측 어느쪽에서도 지정할 수 있으며 `ForeignKey(unique=True)`와 비슷하지만 엄연하게 reverse와는 차이를 보입니다. to, on_delete 옵션을 지정할 수 있으며 User : Profile 관계에서 FK로 지정하여 접근할 때는 `profile.user_set.first()`으로 표기하며 OneToOne일때는 `profile.user` `소문자`로 접근하게 됩니다.
+
+```python
+from accounts.models import Profile
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+user = User.objects.first()
+print(user.profile) #프로필 record가 없을때 RelatedObjectDoesNotExist
+
+#위 user.profile과 아래 profile.user가 동일 (OneToOne)
+#profile = Profile.objects.first()
+#print(profile.user) #프로필 record가 없을때 DoesNotExist
+
+
+```
+
+보통 OneToOne관계의 User <-> Profile은 User를 insert한 후 `signal` 이란 장고에서 지원하는 이벤트핸들러와 비슷한 기능처럼 Profile도 자동 생성되도록 로직을 구현합니다. (signal의 다른 예로 좋아요 +,-)
+
+
+
 ## Django - Serializing multiple objects
 
 다수의 데이터 queryset 형태를 serialize화 하고자 할 때 many=True 사용
