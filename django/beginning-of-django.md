@@ -152,6 +152,7 @@ ex) Blog App -> Post Model 시 표기 : blog_post
 해당 앱/admin.py에 다음과 같이 작성한다.
 
 - `admin.site.register(앱이름)`
+- `python manage.py createsuperuser`
 
 ### 모델 클래스 __str__
 
@@ -523,7 +524,7 @@ class Post(models.Model):
 
 ## OneToOneField 
 
-1:1 관계 양측 어느쪽에서도 지정할 수 있으며 `ForeignKey(unique=True)`와 비슷하지만 엄연하게 reverse와는 차이를 보입니다. to, on_delete 옵션을 지정할 수 있으며 User : Profile 관계에서 FK로 지정하여 접근할 때는 `profile.user_set.first()`으로 표기하며 OneToOne일때는 `profile.user` `소문자`로 접근하게 됩니다.
+1:1 관계 양측 어느쪽에서도 지정할 수 있으며 `ForeignKey(unique=True)`와 비슷하지만 엄연하게 reverse와는 차이를 보입니다. (to, on_delete) 옵션을 지정할 수 있으며 User : Profile 관계에서 FK로 지정하여 접근할 때는 `profile.user_set.first()`으로 표기하며 OneToOne일때는 `profile.user` `소문자`로 접근하게 됩니다.
 
 ```python
 from accounts.models import Profile
@@ -537,10 +538,71 @@ print(user.profile) #프로필 record가 없을때 RelatedObjectDoesNotExist
 #profile = Profile.objects.first()
 #print(profile.user) #프로필 record가 없을때 DoesNotExist
 
-
 ```
 
 보통 OneToOne관계의 User <-> Profile은 User를 insert한 후 `signal` 이란 장고에서 지원하는 이벤트핸들러와 비슷한 기능처럼 Profile도 자동 생성되도록 로직을 구현합니다. (signal의 다른 예로 좋아요 +,-)
+
+
+
+## ManyToManyField
+
+M:N관계에서 가장 대표적인 예로 Post:Tag가 있습니다.
+
+양쪽 아무곳이나 필드 지정 가능하며 (to, blank=False) 옵션을 줄 수 있습니다.
+
+```python
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    #post_set = models.ManyToManyField(Post, blank=True) #Post에서 tag_set = models.ManyToManyField(Tag)로 지정 가능
+    #tag를 위로 올려도 되고 안올릴때는 문자열로 작성
+    #blank옵션 꼭 신경쓰기 
+   
+    
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_public = models.BooleanField(default=False, verbose_name="공개여부")
+    tag_set = model.ManyToManyField(Post, blank=True)  #보통 태그를 활용하는쪽에 필드로 작성하기(본질과 사용 의미에 가까움) Post:Tag시 Post에 ManyToMany 필드 추가
+    
+
+   
+Tag.objects.create(name="장고") #insert
+tag = Tag.objects.get(name="live-jh")
+#개별 태그 추가(tag_set으로 접근)
+post.tag_set.add(tag) 
+post.tag_set.all()
+
+#여러 태그 추가
+tag_set = Tag.objects.all()
+post.tag_set.add(*tag_set) #unpack (multiple add시 앞에 * 붙이기)
+```
+
+
+
+## Migrations 
+
+모델 변경내역을 DB 스키마로 반영시키는 효율적 방법을 제공하는 명령어입니다.
+
+- 마이크레이션 파일 생성 -> `python manage.py makemigrations 앱이름`
+- 지정 DB에 마이그레이션 적용 -> `python manage.py migrate 앱이름`
+  -  `python manage.py migrate 앱이름 마이그레이션명`
+  -  `python manage.py migrate 앱이름 zero` -> 모든 마이그레이션 rollback
+- 마이그레이션 적용 결과 출력 -> `python manage.py showmigrations 앱이름` 
+  - X 표기가 없을시 미적용
+- 지정 마이그레이션의 sql 출력 -> `python manage.py sqlmigrate 앱이름 마이그레이션명`
+- 같은 Migration 파일이라도 DB 종류에 따라 다른 SQL이 생성될수도 있는 점은 늘 참고해서 사용
+- 모델 필드 관련하여 어떤 작은 변경이라도 발생시에는 마이그레이션 파일을 생성하기
+  - 마이그레이션 파일은 모델 변경 내역을 누적하는 역할
+  - 마이그레이션의 파일이 많아질경우 `squashmigrations` 명령으로 다수 마이그레이션 파일을 통합하여 사용하기 (제거 금지)
+- 모든 테이블은 각 row의 식별기준인 pk가 필요하는데 장고에서도 마찬가지로 pk로 id 필드를 default로 생성 (다른 필드를 기본키로 지정하고자 한다면 primary_key=True 옵션 사용)
+
+### 마이그레이션 파일 생성 및 적용 순서
+
+1. 모델 변경내역 정의
+2. makemigrations 명령
+3. `python manage.py sqlmigrate 앱이름 마이그레이션명` 으로 SQL확인(의도한대로 생성이 되는지 체크)
+4. migrate 명령
+5. DB 적용
 
 
 
