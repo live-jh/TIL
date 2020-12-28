@@ -604,7 +604,28 @@ post.tag_set.add(*tag_set) #unpack (multiple add시 앞에 * 붙이기)
 4. migrate 명령
 5. DB 적용
 
+## 새로 추가한 필드가 필수 필드일때
 
+makemigrations 명령시 기존 record에 어떤 값을 넣을지 묻는 기능
+
+```python
+You are trying to add a non-nullable field 'author' to post without a default; we can't do that (the database needs something to populate existing rows).
+Please select a fix:
+ 1) Provide a one-off default now (will be set on all existing rows with a null value for this column)
+ 2) Quit, and let me add a default in models.py
+
+>>> 1 or 2
+```
+
+## 협업 Tip
+
+- 마이그레이션 파일 생성은 1명이 전담해서 생성하고 팀원 각자 개인적으로 마이그레이션 파일을 생성하지 않도록 한다. 생성한 마이그레이션 파일은 버전관리에 넣고 다른 팀원들은 이를 pull을 받고 migrate만 사용합니다.
+- 서버에 반영하지 않은 마이그레이션을 다수 생성했다면
+  - 그대로 서버에 반영하지 않고 하나의 마이그레이션으로 합쳐 적용하는 것을 권장
+    - 서버로 미적용 마이그레이션들을 모두 롤백
+    - 롤백된 마이그레이션 파일 제거
+    - 새로 마이그레이션 파일 생성
+  - 미적용 마이그레이션을 통합하여 하나로 생성 `squashmigrations` 명령
 
 ## Django - Serializing multiple objects
 
