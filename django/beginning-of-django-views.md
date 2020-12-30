@@ -21,6 +21,8 @@
 
 - path를 통해 전달된 인자는 Converter의 to_python에 맞게 변환된 값이 인자로 전달됩니다. `path('<int:pk>', view.post_detail) -> int로 변환된 인자 전달` 
 
+
+
 ## View 호출의 리턴
 
 render함수를 통해 HttpResponse를 리턴해야합니다. 만약 다른 타입을 리턴하게 된다면 Midellware에서 처리 오류를 발생시킵니다.
@@ -48,6 +50,8 @@ return response
 
 <img width="328" alt="스크린샷 2020-12-29 오후 11 16 31" src="https://user-images.githubusercontent.com/48043799/103290677-6e554d80-4a2d-11eb-8c30-c777f9f4f004.png">
 
+
+
 ## HttpRequest & HttpResponse
 
 ```python
@@ -57,6 +61,8 @@ def index(request: HttpRequest, pk: int) -> HttpResponse:
    #request.META, request.GET, Post, body, FILES등
 	 return pass
 ```
+
+
 
 ## URL Dispatcher
 
@@ -82,6 +88,8 @@ urlpatterns = [
 
 ```
 
+
+
 ## URL Patterns Ex
 
 ```python
@@ -93,6 +101,8 @@ urlpatterns = [
 ]
 
 ```
+
+
 
 ## path와 re_path
 
@@ -107,6 +117,8 @@ path는 Path converters를 통해 정규표현식 기입을 간소화시켜주�
 - ^: 정규표현식 시작기호
 - $: 정규표현식 종료 기호
 - r: 이스케이프 기호 (raw의 약자로 \를 자동 이스케이프 처리되는 파이썬 기본 문법)
+
+
 
 ## 다양한 정규표현식 패턴 Ex(띄어쓰기 x)
 
@@ -125,6 +137,8 @@ path는 Path converters를 통해 정규표현식 기입을 간소화시켜주�
 - r"\d*" -> 0회 이상
 - r"\d+" -> 1회 이상
 
+
+
 ## 새로운 장고 앱 생성시 작업 순서
 
 1. 앱 생성
@@ -133,6 +147,89 @@ path는 Path converters를 통해 정규표현식 기입을 간소화시켜주�
 4. 프로젝트/settings.py INSTALLED_APPS에 앱이름 등록
 
 
+
+## 함수 기반 View
+
+View 구현의 가장 기초 및 기본, 공통 기능들은 장식자 문법 사용
+
+```python
+@api_view(["GET"])
+@throttle_classes([OncePerDayUserThrottle])
+def PostView(request, id):
+		return Response({"message": "STATUS_RESPONSE_SUCCESS"})
+```
+
+
+
+## 클래스 기반 View
+
+공통 기능들은 상속 문법 사용, View 함수를 만들어주는 클래스로 as_view() 클래스 함수를 통해 View 함수 생성, 상속을 통해 여러 기능을 사용할 수 있습니다.
+
+django.views.generic는 장고의 기본 클래스뷰 패키지입니다.
+
+### View
+
+모든 CBV의 모체이며 http method 요청에 따라 get, post, put, delete 멤버 함수를 호출하여 구현합니다.
+
+```python
+class PostAPI(APIView):
+  throttle_classes = [OncePerDayUserThrottle] #요청수 제한
+	def get(self, request, id):
+		return Response({"message": "STATUS_RESPONSE_SUCCESS"})
+  
+  def post(self, request):
+    return Response({"message": "STATUS_RESPONSE_SUCCESS"})
+```
+
+### get_object_or_404()
+
+```python
+try:
+   post = Post.objects.get(id=pk)
+except Post.DoesNotExist:
+   raise Http404
+post = get_object_or_404(Post, id=pk) #위 예외처리 코드와 같은 기능
+```
+
+## 장고 부트스트랩 4 라이브러리
+
+bootstrap-pagination 기능 활용
+
+- `pip install django-bootstrap4`
+
+- setting.py -> add django-bootstrap4 
+
+## 장고 기본 CBV API 
+
+리스트 참고
+
+
+
+## 장식자 (Decorator)
+
+어떤 함수를 감싸는 (wrapping) 함수 (자바의 어노테이션 표기와 같다) 
+
+```python
+@login_required
+def protected_view(request):
+	return render(request, 'myBlog/index.html')
+```
+
+### django.views.decorators.http
+
+- require_http_methods, require_GET, require_POST등 (지정 method가 아니면 HttpResonseNotAllowed 응답)
+
+### django.contrib.auth.decorators
+
+- user_passes_test: 지정 함수가 False 반환시 login_url 으로 redirect
+  - 해당 유저가 어떤 조건을 부합하는지에 따라 처리할 수 있는 기능 지원
+- login_required: 로그아웃 상황에서 login_url 으로 redirect
+- permission_required: 지정 퍼미션 없을시 login_url 으로 redirect
+  - 장고 기본 퍼미션 시스템으로 판단하여 처리할 수 있는 기능을 지원
+
+### django.contrib.admin.views.decorators
+
+- staff_member_required: staff memberr가 아닌 경우 login url redirect
 
 ## Reference
 
