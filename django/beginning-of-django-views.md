@@ -66,7 +66,7 @@ def index(request: HttpRequest, pk: int) -> HttpResponse:
 
 ## URL Dispatcher
 
-특정 URL 패턴 -> View List
+urls.py 변경으로 각 뷰에 대한 url 변경되는 유연한 시스템입니다.
 
 프로젝트/settings.py의 최상위 URLConf 모듈을 지정할 수 있으며 최초의 urlpatterns로 부터 include를 통해 트리 구조로 확장도 가능합니다. http 요청에 따라 등록된 root_urlconf  매핑 리스트를 순차적으로 확인하면서 url 매칭하는 구조로 이루어져있습니다. (매칭되는 url이 여러개라면 처음 Rule만 사용)
 
@@ -136,6 +136,58 @@ path는 Path converters를 통해 정규표현식 기입을 간소화시켜주�
 - r"\d?" -> 0회 또는 1회
 - r"\d*" -> 0회 이상
 - r"\d+" -> 1회 이상
+
+
+
+## URL Reverse
+
+개발자가 하나하나 url을 명시하지 않아도 되는 기능이며 url이 변경되어도 reverse 기능으로 변경된 url을 추적하여 연결해주는 것을 역할을 합니다.
+
+### URL Reverse를 수행하는 4가지 함수
+
+**url template tag**: 내부적으로 reverse 함수 사용
+
+**reverse method**: 매칭 url이 없을때 NoReverseMatch 예외 발생
+
+**resolve_url method**: 매칭 url이 없을때 인자 문자열을 그대로 리턴 (내부적으로 reverse 사용)
+
+**redirect method**: 매칭 url이 없을때 인자 문자열을 그대로 리턴 (내부적으로 resolve_url 사용)
+
+```python
+{% url "blog:post_detail" 100 %}
+{% url "blog:post_detail" pk=100 %}
+
+reverse('blog:post_detail', args=[100]) # appName:pathName
+reverse('blog:post_detail', kwargs={'pk':100}) # 파라미터 {}로 전달
+
+resolve_url('blog:post_detail', 100)
+resolve_url('blog:post_detail', 100, pk=100)
+
+redirect('blog:post_detail', 100)
+redirect('blog:post_detail', pk=100)
+```
+
+### 모델 객체에 대한 detail 주소 계산
+
+`redirect('blog:post_detail', pk=post.pk) -> redirect(post)` 으로 간단히 변경 은 모델 클래스에 `get_absolute_url()` 을 구현합니다. 다른 활용법으로는 CreateView, UpdateView에서 success_url을 지정하지 않을 경우 model instance에 지정한 get_absolute_url 주소를 확인하여 이동이 가능할경우 이동합니다.
+
+```
+resolve_url(to, *args, **kwargs): #to는 모델 객체일수도 있고 url을 받을수도 있다.
+
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    post_img = models.ImageField(blank=True, upload_to="instagram/post/%Y/%m%d")
+    is_public = models.BooleanField(default=False, verbose_name="공개여부")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tag_set = models.ManyToManyField('Tag', blank=True)
+
+```
+
+
+
+
 
 
 
@@ -343,6 +395,34 @@ post_list = PostListView.as_view()
 ### django.contrib.admin.views.decorators
 
 - staff_member_required: staff memberr가 아닌 경우 login url redirect
+
+
+
+## Http 상태코드
+
+HttpResponse 클래스마다 고유한 status_code 할당, REST_API 생성시 사용합니다.
+
+### 200번대: 성공
+
+- 200: 서버 요청 처리 success
+- 201: 요청 접수 후 새 리소스 작성시
+
+### 300번대: 요청을 마치기 위해 추가 조치 필요
+
+- 301: 영구이동, 요청 페이지가 새 위치로 영구적 이동
+- 302: 임시이동, 요청자는 향후 원래 위치를 계속 사용해야할 때
+
+### 400번대: 클라이언트측 오류
+
+- 400: 잘못된 요청
+- 401: 권한 없음
+- 403: 필요한 권한을 가지고 있지 않아 요청 거부
+- 404: 서버에서 요청한 리소스 찾을 수 없음
+- 405: 허용되지 않는 요청 (ex: get인데 post요청시)
+
+### 500번대: 서버측 오류
+
+- 500: 서버 내부 오류
 
 
 
