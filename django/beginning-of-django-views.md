@@ -150,7 +150,7 @@ path는 Path converters를 통해 정규표현식 기입을 간소화시켜주�
 
 ## 함수 기반 View
 
-View 구현의 가장 기초 및 기본, 공통 기능들은 장식자 문법 사용
+View 구현의 가장 기초 및 기본, 공통 기능들은 장식자 문법 사용합니다. 404, 403, 500 에러 핸들링은 함수기반View를 통해 사용합니다.
 
 ```python
 @api_view(["GET"])
@@ -159,29 +159,7 @@ def PostView(request, id):
 		return Response({"message": "STATUS_RESPONSE_SUCCESS"})
 ```
 
-
-
-## 클래스 기반 View
-
-공통 기능들은 상속 문법 사용, View 함수를 만들어주는 클래스로 as_view() 클래스 함수를 통해 View 함수 생성, 상속을 통해 여러 기능을 사용할 수 있습니다.
-
-django.views.generic는 장고의 기본 클래스뷰 패키지입니다.
-
-### View
-
-모든 CBV의 모체이며 http method 요청에 따라 get, post, put, delete 멤버 함수를 호출하여 구현합니다.
-
-```python
-class PostAPI(APIView):
-  throttle_classes = [OncePerDayUserThrottle] #요청수 제한
-	def get(self, request, id):
-		return Response({"message": "STATUS_RESPONSE_SUCCESS"})
-  
-  def post(self, request):
-    return Response({"message": "STATUS_RESPONSE_SUCCESS"})
-```
-
-### get_object_or_404()
+### get_object_or_404() 에러처리
 
 ```python
 try:
@@ -189,7 +167,138 @@ try:
 except Post.DoesNotExist:
    raise Http404
 post = get_object_or_404(Post, id=pk) #위 예외처리 코드와 같은 기능
+
+
+def handler404(request):
+  return render(request, '403.html', status=403)
+
+def handler500(request):
+  return render(request, '500.html', status=500)
+  
 ```
+
+## 
+
+## 클래스 기반 View
+
+공통 기능들은 상속 문법 사용, View 함수를 만들어주는 클래스로 as_view() 클래스 함수를 통해 View 함수 생성, 상속을 통해 여러 기능을 사용할 수 있습니다. 또한 객체지향을 활용해 코드의 재사용과 개발 생산성을 높여주는 기능을 합니다.
+
+### Generic View
+
+- **Base View**: 뷰 클래스 생성하고, 제네릭 뷰의 모체(부모) 클래스가 되는 뷰
+  - View: 최상위 부모 뷰
+  - TemplateView: 주어진 템플릿으로 렌더
+  - RedirectView: 주어진 URL로 리다이렉트
+- **Display View**: 객체 목록, 하나의 객체 상세정보를 보는 뷰
+  - DetailView: 조건에 맞는 하나의 객체 출력
+  - ListView: 조건에 맞는 객체 목록 출력
+- **Edit View**: 폼을 통해 create, update, delete를 수행하는 뷰
+  - FormView: 폼을 주어지면 해당 폼 출력
+  - CreateView: 객체를 생성하는 폼 출력
+  - UpdateView: 기존 객체 수정하는 폼 출력
+  - DeleteView: 기존 객체 삭제하는 폼 출력
+- **Date View**: 날짜 기반의 객체 연/월/일로 구분해 보여주는 뷰
+  - YearArchiveView: 연도에 해당하는 객체 출력
+  - MonthArchiveView: 월에 해당하는 객체 출력
+  - DayArchiveView: 일에 해당하는 객체 출력
+  - TodayArchiveView: 오늘에 해당하는 객체 출력
+  - DateDetailView: 주어진 연,월,일 PK에 해당하는 객체 출력
+
+### Generic View Overriding
+
+**model**
+
+BaseView를 제외한 모든 제네릭 뷰에서 사용
+
+**queryset**
+
+queryset을 사용하면 model은 무시 (BaseView를 제외한 모든 제네릭 뷰 사용)
+
+**template_name**
+
+TemplateView를 포함한 모든 제네릭 뷰에서 사용, 문자열로 지정
+
+**context_object_name**
+
+view에서 템플릿 파일에 전달하는 컨텍스트 변수명 지정
+
+**paginate_by**
+
+ListView와 날짜 기반 View에 사용 (페이징 기능 활성화 된 경우 페이지당 row 갯수 지정)
+
+**date_field**
+
+날짜 기반 뷰에서 사용 (필드타입은 DateField or DateTimeField)
+
+**form_class**
+
+FormVIew, CreateView, UpdateView에서 폼을 생성시 클래스로 지정
+
+**success_url**
+
+edit view 폼에 대한 처리가 성공시 리다이렉트할 url 지정
+
+### method overriding
+
+`def get_queryset()`, `def_get_context_data(**kwargs)`, `def form_valid(form)`
+
+### 모델을 지정하는 방식 3가지
+
+- model 속성 변수 지정
+
+  - `model = Post`
+
+- queryset 속성 변수 지정
+
+  - `queryset = Post.objects.filter(is_public=True)`
+
+- `def get_queryset()` 오버라이딩
+
+  - ```python
+    def get_queryset(self):
+    		qs = super().get_queryset() 
+            if not self.request.user.is_authenticated: 
+                qs = qs.filter(is_public=True) 
+            return qs
+    ```
+
+
+
+### Generic List, DetailView Ex
+
+```python
+#예제코드
+from django.views.generic import ListView, DetailView
+from .models import Post
+
+#ListView
+class PostListView(ListView):
+  	model = Post
+    paginate_by = 10
+    throttle_classes = [OncePerDayUserThrottle] #요청수 제한
+	
+	  def get_queryset(self):
+        return Post.objects.order_by('-created_at')[:20]
+  
+post_list = PostListView.as_view()
+
+#DetailView
+class PostDetailView(DetailView):
+    model = Post
+		
+    def get_queryset(self):
+        # request 인자는 class기반 View에서 self.request로 접근가능
+        qs = super().get_queryset()  # 재정의할때 super 호출
+        if not self.request.user.is_authenticated: 
+            qs = qs.filter(is_public=True)  # 공개 게시물만 허용
+        return qs
+
+
+post_detail = PostDetailView.as_view()
+
+```
+
+
 
 ## 장고 부트스트랩 4 라이브러리
 
@@ -197,11 +306,7 @@ bootstrap-pagination 기능 활용
 
 - `pip install django-bootstrap4`
 
-- setting.py -> add django-bootstrap4 
-
-## 장고 기본 CBV API 
-
-리스트 참고
+- setting.py -> INSTALLED_APPS  add "bootstrap4"
 
 
 
@@ -210,9 +315,17 @@ bootstrap-pagination 기능 활용
 어떤 함수를 감싸는 (wrapping) 함수 (자바의 어노테이션 표기와 같다) 
 
 ```python
-@login_required
+@login_required #함수
 def protected_view(request):
 	return render(request, 'myBlog/index.html')
+
+
+@method_decorator(login_required, name="dispatch") #클래스형
+class PostListView(ListView):
+    model = Post
+    paginate_by = 10
+
+post_list = PostListView.as_view()
 ```
 
 ### django.views.decorators.http
@@ -231,6 +344,9 @@ def protected_view(request):
 
 - staff_member_required: staff memberr가 아닌 경우 login url redirect
 
+
+
 ## Reference
 
 - https://educast.com/course/web/ZU53/
+- https://wikidocs.net/book/837
