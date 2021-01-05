@@ -139,6 +139,26 @@ class PostForm(forms.ModelForm):
 
 
 
+## 사이트간 요청 위조 공격 & 방어를 위한 Token 체크
+
+사용자가 의도하지 않은 게시판에 글을 쓰거나, 쇼핑을 하게 하는 공격등이 있습니다.
+
+이미지 태그에 src="http://site-victim.com/travel/102/update/?src=Bali&dest=Korea" 처럼 사이트 url의 파라미터를 보내거나 또는 post요청을 보내는등 다양한 요청 위조가 가능합니다.
+
+이러한 공격을 막기 위해 POST 요청에 한해서 Django는 CsrfViewMiddleware로 방어를 할 수 있습니다. POST 요청시 Token값이 없거나 유효하지 않으면 403 응답을 보냅니다.
+
+### 처리순서
+
+1. 입력 Form을 보여주고 CSRF Token값도 함께 할당
+   1. CSRF Token은 사용자별로 다르며 지속적으로 변경
+2. 입력을 통한 Form이 전달 될 경우 Token 유효성 검증
+
+CSRF_Token은 유저인증 토큰이 아니며 JWT(Json Web Token) 또한 아닌 전혀 다른 개념의 토큰인 것을 알고 있어야 합니다.  현재의 요청이 유효한지에 대한 토큰일뿐 유저인증과는 전혀 별개의 토큰인 것을 참고해야 합니다.
+
+사용하는데 거의 비용이 들지 않으므로 기본적으로 사용하지만 만약 특정 View에 따라 Csrf Token 체크를 하지 않고 싶을때는 해당 View에 `@csrf_exempt` 장식자를 추가하는 방법을 사용합니다. 
+
+또한 DRF(django-rest-framework)의 APIView엔 csrf_exempt가 자동으로 적용되어져 있습니다.
+
 
 
 
