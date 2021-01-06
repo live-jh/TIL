@@ -128,6 +128,8 @@ return render(request,
 
 ## ModelForm(admin에선 내부적으로 사용)
 
+장고 Form을 상속받아 지정된 Model로부터 필드 정보를 읽어 Form Fields를 세팅합니다. 내부적으로 해당 Model의 Instance를 유지하며 유효성 검증에 통과한 값으로 저장 및 수정 기능을 지원합니다.
+
 ```python
 from django import forms
 
@@ -136,6 +138,18 @@ class PostForm(forms.ModelForm):
 	model = Post
 	fields = '__all__' # 전체 필드__all__, 개별은 ['field_1', 'field_2', ...]
 ```
+
+```python
+form = PostForm(request.POST, request.FILES)
+post = form.save(commit=True) #default commit=True 설정, False시 save 호출 작동 안함(저장 안됌)
+
+```
+
+참고사항으로는 form.save() != instance.save()  같지 않고 form.save에서 내부적으로 instance.save 기능을 호출할 수 있고 인자로 commit 옵션을 보내주어 사용합니다.
+
+commit=False는 instance.save() 함수 호출을 지연시키고자 할 때 사용합니다.
+
+
 
 
 
@@ -157,7 +171,28 @@ CSRF_Token은 유저인증 토큰이 아니며 JWT(Json Web Token) 또한 아닌
 
 사용하는데 거의 비용이 들지 않으므로 기본적으로 사용하지만 만약 특정 View에 따라 Csrf Token 체크를 하지 않고 싶을때는 해당 View에 `@csrf_exempt` 장식자를 추가하는 방법을 사용합니다. 
 
-또한 DRF(django-rest-framework)의 APIView엔 csrf_exempt가 자동으로 적용되어져 있습니다.
+또한 DRF(django-rest-framework)의 APIView엔 csrf_exempt가 자동으로 적용되어져 있습니다. (앱인증은 jwt, 유저인증토큰으로 활용)
+
+### 쿠키에서 csrf_token 가져오기
+
+```javascript
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+```
 
 
 
