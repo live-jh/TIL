@@ -136,7 +136,7 @@ from django import forms
 class PostForm(forms.ModelForm):
 	class Meta:
 	model = Post
-	fields = '__all__' # 전체 필드__all__, 개별은 ['field_1', 'field_2', ...]
+	fields = '__all__' # 전체 필드__all__, 개별은 ['field_1', 'field_2', ...], exclude는 제외시킬 필드 -> 추천하지 않음
 ```
 
 ```python
@@ -148,6 +148,25 @@ post = form.save(commit=True) #default commit=True 설정, False시 save 호출 
 참고사항으로는 form.save() != instance.save()  같지 않고 form.save에서 내부적으로 instance.save 기능을 호출할 수 있고 인자로 commit 옵션을 보내주어 사용합니다.
 
 commit=False는 instance.save() 함수 호출을 지연시키고자 할 때 사용합니다.
+
+
+
+## django request meta (유저 ip정보)
+
+- REMOTE_ADDR
+- models.GenericIPAddressField(IPv4, IPv6 저장 필드)
+
+```python
+#request.POST
+form = CommentForm(request.POST, request.FILES)
+if form.is_valid():
+	comment = form.save(commit=False)
+	comment.ip = reqeust.META['REMOTE_ADDR'] #IP 가져오기
+	comment.save()
+	return redirect('/')
+else:
+	form = CommentForm()
+```
 
 
 
