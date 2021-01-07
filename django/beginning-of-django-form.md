@@ -215,6 +215,81 @@ const csrftoken = getCookie('csrftoken');
 
 
 
+## 유효성 검사 호출 로직
+
+1. **form.full_clean() 호출**
+   1. 각 필드 객체 별로(해당 `객체.clean()`을 통해 각 필드 type에 맞춰 검사),  필드 2개 이상일때 사용
+      1. `다수 필드`에 대한 검사/변경, 예외 발생시 non_field_errors로 분류
+   2. Form 객채 내에서 필드 별로 `form.clean_필드명()` 함수가 존재할 시 호출 후 유효성 검사
+      1. `특정 필드별` 검사/변경, 예외 발생시 해당 필드 Error로 분류
+2. **에러 유무에 따른 True/False**
+   1. Validator 함수를 통한 유효성 검사
+      1. 원하는 조건에 부합하지 않을 시 ValidationError 예외를 발생시키며 리턴값은 사용되지 않습니다.
+
+> **참고**
+>
+> https://github.com/django/django/blob/master/django/forms/forms.py
+>
+> def _clean_fields(self):
+
+## Validator 지정
+
+함수형과 클래스형 2가지로 나뉘며 **함수형**은 유효성 검사를 수행할 데이터 값 즉, 하나의 인자를 받은 객체 callable(객체리턴) object이며 **클래스형**은 클래스의 인스턴스 자체가 callable object입니다. 주요 클래스 validator로는 RegexValidator(__call__ 메소드 사용)가 있고 함수의 형태로 구현 할때는 validators 함수를 정의하고 해당 모델 클래스 필드내에 `validators=` 정의한 함수를 옵션을 주어 사용하게 됩니다. 보통 빌트인 Validators를 가장 많이 사용합니다.
+
+### Built-in Validator
+
+- RegexValidator
+- EmailValidator
+- URLValidator
+- validate_ipv4_address
+- MaxValueValidator
+- MinValueValidator
+- ...
+
+### 모델 필드에 default 적용된 validators
+
+EmailField, URLField, GenericIPAddressField, SlugField
+
+### validator 사용시 알아야 하는 점
+
+- 모든 validators는 모델에 정의하고, ModelForm을 통해 모델의 validators 정보 함께 사용
+
+
+
+## Form clean 함수의 순기능
+
+- 필드별 Error 기록 or Non 필드 Error 기록
+  - add_error(필드명, 오류내용) 함수를 통해 직접호출 가능
+- 원하는 format으로 값 변경 (리턴값을 이용)
+
+
+
+### Example Validators
+
+```python
+class GameUser(models.Model):
+server = models.CharField(max_length=10)
+username = models.CharField(max_length=20, validators=[MinLengthValidator(3)]) # validators 체크 최소 길이 3 이상
+
+#unique 속성 설정
+	class Meta: 
+    unique_together = [ 
+      ('server', 'username'),
+    ]
+  
+  
+class GameUserSignupForm(forms.ModelForm): 
+  class Meta:
+		model = GameUser
+		fields = ['server', 'username']
+	
+  #해당 필드의 값 변경은 clean 함수에서만 가능하며 Validator내에서는 지원하지 않음
+  def clean_username(self):
+	return self.cleaned_data.get('username', '').strip()
+```
+
+
+
 
 
 ## Reference
