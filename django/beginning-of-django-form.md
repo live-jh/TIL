@@ -290,6 +290,62 @@ class GameUserSignupForm(forms.ModelForm):
 
 
 
+## Messages Framework
+
+현 User 사용자를 위한 일회성 메세지를 사용하기 위한 용도로 쓰여집니다. HttpRequest 인스턴스를 통해 메세지를 남기며 1회 노출 이후 종료됩니다. `View를 통한 템플릿 시스템`을 통해 작동되며 `템플릿 내에 JavaScript`를 통해 노출도 가능합니다.
+
+### Message Levels
+
+레벨에 따라 로깅 여부 판단을 하며 레벨의 종류로는 DEBUG, INFO, SUCCESS, WARNING, ERROR등이 있습니다
+
+```python
+from django.contrib import messages
+# View의 함수!
+
+def post_new(request):
+	if form.is_valid():
+		post = form.save()
+		messages.success(reqeust, '새 글이 등록되었네잉?') #shortcut 형태, 쌓인 메세지를 한번에 소비
+		return redirect(post)
+```
+
+### context_processors
+
+템플릿 기본 로딩 변수목록을 생성해주는 함수
+
+![스크린샷 2021-01-09 오후 9 54 31](https://user-images.githubusercontent.com/48043799/104093675-4f797580-52cf-11eb-8073-0f44ca8f6a29.png)
+
+> django-document 참고
+>
+> settings.py에 templates의 options 내에 context-processors 내에 auth, request, debug, messages등 변수로 사용 가능
+
+### 1. 출력 tags 변수 변경하기
+
+```python
+#settings.py
+#messages levels의 default로 부트스트랩과 겹치지 않는 부분은 debug와 error이므로 이 2개에 대한 tags를 대응해주기 위한 settings 설정 
+from django.contrib.messages import constants as messages_contants
+
+MESSAGE_TAGS = {
+    messages_contants.DEBUG: 'secondary', 
+    messages_contants.ERROR: 'danger',
+}
+```
+
+### 2. django-bootstrap4 템플릿 태그 활용
+
+```html
+{% load i18n bootstrap4 %}
+
+{% for message in messages %}
+	<div class="{{ message|bootstrap_message_classes }}">
+		<button type="button" class="close" data-dismiss="alert">x</button> {{message}}
+	</div>
+{% endfor %}
+```
+
+> https://django-bootstrap4.readthedocs.io/en/latest/templatetags.html#bootstrap-messages
+
 
 
 ## Reference

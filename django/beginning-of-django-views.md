@@ -348,6 +348,32 @@ class PostDetailView(DetailView):
 
 post_detail = PostDetailView.as_view()
 
+
+
+
+```
+
+### CreateView, UpdateView, DeleteView
+
+```
+#CreateView
+class PostCreateView(CreateView):
+    model = Post
+    form_class = PostForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.author = self.request.user
+        messages.success(self.request, '메세지를 등록하였습니다.')
+        return super().form_valid(form)
+
+
+post_new = PostCreateView.as_view()
+
+#UpdateView
+
+#DeleteView
+
 ```
 
 
