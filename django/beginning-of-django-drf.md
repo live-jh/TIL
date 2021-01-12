@@ -59,6 +59,41 @@ Representational State Transfer의 줄임말로 모든 자원을 리소스로 �
 
 APIView/Generic/ViewSet/ModelViewSets을 통한 요청 처리를 하며 Renderer를 통한 다양한 응답포맷도 지원하고 인증, 권한등의 써드파티를 이용해 JWT인증 처리도 구현할 수 있습니다.
 
+## URL 설계
+
+`/post/` => 하나의 view에서 2가지 분기처리
+
+- GET : 목록 리스트 응답
+- POST : 새글 생성 후 확인 응답
+
+`/post/3/` -> 하나의 view에서 3가지 분기처리
+
+- GET : 3번 글 정보 응답
+- POST : 3번 글 수정, 저장 후 확인 응답
+- DELETE : 3번 글 삭제 후 확인 응답
+
+DRF는 정형화된 중복 코드를 줄일 수 있도록 도와주는 ClassBased View를 비롯해 다양한 기능을 지원합니다.
+
+
+
+### Http 클라이언트 프로그램 (httpie, postman)
+
+http 설치: `pip install httpie`
+
+### Httpie 명령 예시
+
+조회 데이터는 `==`, 입력/수정/삭제 데이터는 `=` 표시
+
+- `$ http GET(생략시 자동 GET) 요청주소 GET인자==값 GET인자==값`
+- `$ http --json POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
+- `$ http --form POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
+- `$ http PUT 요청주소 GET인자==값 GET인자==값 PUT인자=값`
+- `$ http DELETE 요청주소 GET인자==값 GET인자==값`
+
+### post 요청 후 
+
+![스크린샷 2021-01-12 오후 11 22 22](https://user-images.githubusercontent.com/48043799/104326454-1a6a5e80-552d-11eb-8abb-8c63b0492a49.png)
+
 
 
 ## Reference

@@ -1,4 +1,4 @@
-# 장고를 시작할 때 알아두면 좋은 개념 - 인증
+# 장고를 시작할 때 알아두면 좋은 개념 - drf
 
 
 
@@ -31,3 +31,10 @@ path('login/', LoginView.as_view(), name='login') #login default template_name =
 - _post_clean: 패스워드의 길이, 적합한 형식등을 체크하는 함수 
 - save(self, commit=True): pw1을 가져와서 save처리
   - 함수내에 set_password('패스워드') -> None일시 로그인처리 할 수 없도록 만드는 것을 의미 (구글인증, 페이스북 Oauth 인증시 유저 패스워드로 로그인 불가처리)
+
+
+
+## Reference
+
+- https://educast.com/course/web/ZU53/
+- https://wikidocs.net/book/837
