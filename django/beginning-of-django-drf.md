@@ -80,19 +80,72 @@ DRF는 정형화된 중복 코드를 줄일 수 있도록 도와주는 ClassBase
 
 http 설치: `pip install httpie`
 
-### Httpie 명령 예시
+### Httpie 명령 예시 (example site: httpbin.org)
 
 조회 데이터는 `==`, 입력/수정/삭제 데이터는 `=` 표시
 
 - `$ http GET(생략시 자동 GET) 요청주소 GET인자==값 GET인자==값`
 - `$ http --json POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
+  - `application/json -> 요청 데이터 JSON 직렬화`
 - `$ http --form POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
+  - `multipart/form-data`
 - `$ http PUT 요청주소 GET인자==값 GET인자==값 PUT인자=값`
 - `$ http DELETE 요청주소 GET인자==값 GET인자==값`
 
-### post 요청 후 
+### post 요청 
 
 ![스크린샷 2021-01-12 오후 11 22 22](https://user-images.githubusercontent.com/48043799/104326454-1a6a5e80-552d-11eb-8abb-8c63b0492a49.png)
+
+
+
+## 직렬화(Serialization)
+
+프로그래밍 언어 또는 소프트웨어 개발에서 통신하거나 저장시 사용하기 편한 형식(문자열)으로 변환하는 것을 말합니다. 역직렬화는 반대로 받은 데이터를 사용(객체)할 수 있도록 변환하는 것이며 포맷으로는 JSON, XML등이 있습니다.
+
+보통 API서버에서는 `JSON`을 사용하며 파이썬에서는 전용 포맷으로 `PICKLE`  을 사용하기도 합니다. `PICKLE`은 파이썬 시스템끼리 통신시만 사용 가능한 점과 버전별 이슈가 있는점이 단점으로 작용합니다.
+
+```python
+post_set = [
+	{'title': 'hello'},
+]
+
+json_string = json.dumps(post_set) #'{"title": "hello"}' #직렬화
+
+json.loads(json_string) #역직렬화
+
+```
+
+
+
+### Object of type User is not JSON serializable
+
+장고 타입(Model, QuerySet)에 대한 직렬화 rule을 기본적으로 지원하지 않아서 발생하는 error입니다. 장고의 DjangoJSONEncoder, json.JSONEncoder, JSONRenderer등을 사용하여 직렬화 작업을 수행할 수 있습니다. 마지막으로 QuerySet은 JsonResponse(MyJSONEncoder)를 통해, Model타입은 따로 ModelSerializer를 통해 변환합니다.
+
+
+
+## ModelSerializer
+
+역할면에서 post 요청만 처리하는 Form으로부터 데이터가 포함된 JSON 문자열을 생성하며 입력된 데이터에 대한 유효성 검사등을 처리할 수 있습니다.
+
+Model 객체는 many=False(default setting) 지정하지만 QuerySet 객체의 경우 필수로 many=True 옵션을 주어야합니다.
+
+![image](https://user-images.githubusercontent.com/48043799/104604680-f3449600-56c0-11eb-99ec-e59761b6e4a5.png)
+
+```python
+serializer = PostSerializer(Post.objects.all(), many=True) #다수일경우 Many = True
+get_serializer = PostSerializer(Post.objects.first()) #Model 객체 = default => False 
+
+serializer.data
+
+```
+
+
+
+## DRF HttpResponse JSON 응답
+
+Response상에선 JSON직렬화가 Lazy하게 동작하며 실 응답을 생성할 때 rendered_content 속성에 접근하며, 접근한 순간 변환 처리가 됩니다.
+
+DRF Response는 요청 콘텐츠 타입에 맞춰 응답을 주는 역할을 합니다. (drf 사용시 늘 Response 사용)
 
 
 
