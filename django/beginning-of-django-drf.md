@@ -149,6 +149,67 @@ DRF Response는 요청 콘텐츠 타입에 맞춰 응답을 주는 역할을 합
 
 
 
+## Response APIView
+
+DRF의 모든 View는 APIView를 상속받습니다. APIView를 통해 Response에 다양한 속성을 지정할 수 있습니다.
+
+### Example
+
+```python
+class AuthorSerializer(ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = [
+            'username',
+            'email',
+            'is_superuser',
+            'is_staff',
+            'is_active',
+            'date_joined',
+        ]
+
+
+class PostSerializer(ModelSerializer):
+    # author_name = serializers.ReadOnlyField(source='author.username')
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Post
+        fields = [
+            'author',
+            'message',
+            'created_at',
+            'updated_at',
+        ]
+
+```
+
+![스크린샷 2021-01-15 오전 12 32 23](https://user-images.githubusercontent.com/48043799/104612084-27bc5000-56c9-11eb-9b38-c161738fcecb.png)
+
+## 
+
+## Serializer View 처리
+
+Form의 생성자 첫번째 인자는 data 자체이지만, Serializer 생성자의 첫번째 인자는 객체의 instance입니다.
+
+> PostSerializer(instance=Post.objects.all(), many=True).data -> instance
+
+APIView 클래스 or @api_view decorators를 활용하여 View의 속성을 부여하여 사용합니다.
+
+### serializers.py
+
+BaseSerializer -> init 함수 확인 (self, instance=None, data=empty, **kwargs) 등
+
+### generics.py
+
+GenericAPIView(views.APIView) 상속 (query_set, serializer_classe) 등
+
+### decorators.py
+
+method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
+
+
+
 ## Reference
 
 - https://educast.com/course/web/ZU53/
