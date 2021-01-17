@@ -1,82 +1,107 @@
 ## Django & React Project Setting
 
-Backend & Frontend 분리
+> 장고 프로젝트 구성을 연습하며 정리한 내용 :)
 
 ### Backend
 
-1. 가상환경 [anaconda](https://www.anaconda.com/products/individual#Downloads) or [virtualenv](https://live-jh.github.io/posts/dev/django_project_setting/)중 택 1
-   1. anaconda 설치시 명령어`conda list`
-   2. `conda create --name 프로젝트명 python=파이썬 버전` -> 아나콘다 가상환경 생성
-   3. `conda activate 프로젝트명` 가상환경 활성화
-   4. `conda deactivate` 가상환경 비활성화
-2. DB 정의 후 Django model 선언
-3. Serializers 설정
-4. `python manage.py makemigrations`
-5. `python manage.py migrate`
-6. serializers 설정 (class)
-7. settings 설정 (installed_apps, debug_toolbar, 개발환경 구성 분리, db설정,  CORS 설정, timezone, root_url, static_url등 수정)
+1. 장고 프로젝트 생성
+   1. pycharm으로 new project시 아래 `2번 과정 생략`
+2. 가상환경 [anaconda](https://www.anaconda.com/products/individual#Downloads) or [virtualenv](https://live-jh.github.io/posts/dev/django_project_setting/)중 택 1 (anaconda version)
+   1. anaconda 설치시 명령어 확인 `$ conda list`
+   2. `$ conda create --name 프로젝트명 python=파이썬 버전` -> 아나콘다 가상환경 생성
+   3. `$ conda activate 프로젝트명` 가상환경 활성화하기
+      4. `$ conda deactivate` 가상환경 비활성화
+3. 실행하려는 명령 커맨드의 위치에서 가상환경 및 명령어 확인
+   1. `$ which python` (디렉토리 위치 확인)
+   2. `$ which pip` (디렉토리 위치 확인)
+4. 프로젝트 설정
+   1. `$ pip install django~=버전(ex: 3.1.1)` 장고 설치 
+   2. `$ which django-admin` (디렉토리 위치 확인)
+   3. `$ django-admin startproject 프로젝트명 .`
+      1. pycharm으로 new project시 명령어 생략
+   4. 프로젝트 라이브러리 지정 (개발&배포 환경 분리)
+      1. requirements/common, requirements/dev, requirements/prod
+         1. -r 읽어들일 파일명.파일형식 (-r common.txt)
+   5. `$ pip list --format=freeze > requirements.txt`
+      1. requirements 생성(conda는 명령어로 list --format을 추가하기)
+      2. virtualenv 가상환경의 경우 `$ pip freeze > requirements.txt`
+5. settings.py 설정(dev, prod 분리)
+   1. settings 개발 환경 분리(settings 폴더 생성)
+      1. settings/settings(base).py, settings/dev.py, settings/prod.py
+   2. settings.py static 설정 추가
+      1. `STATIC_URL = '/static/'`
+         1. 웹 페이지에서 사용할 정적 파일의 최상위 URL 경로로 경로 자체는 실제 파일이나 디렉토리가 아니며 순수 URL로만 존재하는 단위입니다. 사용자가 임의로 변경이 가능하며 반드시 문자열로 구성되어 /로 끝나야 합니다.
+      2. `STATIC_ROOT = os.path.join(BASE_DIR, 'static')`
+         1. Django 프로젝트에서 사용하는 모든 정적 파일을 한 곳에 모아넣는 경로
+         2. 지정한 디렉토리로 모으는 명령은 `manage.py` 파일의 `collectstatic` 명령어로 수행
+            1. [collectstatic 설명](https://github.com/live-jh/TIL/blob/master/django/django-frontend-base.md) 참고
+      3. `STATICFILES_DIRS = [os.path.join(BASE_DIR, '프로젝트이름', 'static')]`
+         1.  개발 단계에서 사용하는 정적 파일이 위치한 경로들을 지정하는 것으로 static 폴더가 프로젝트 바로 아래 경로에 있다면 프로젝트 이름은 생략 가능
+      4. `MEDIA_URL = '/media/'`
+         1. 파일의 url 접근시 사용되는 설정
+         2. STATIC_URL과 비슷한 기능
+      5. `MEDIA_ROOT = os.path.join(BASE_DIR, 'media')`
+         1. 파일 업로드시 사용되는 설정 (업로드 후 파일 배치할 최상위 경로 지정)
+         2. STATIC_ROOT와 다른 경로로 지정해야 합니다.
+   3. TEMPLATES 설정
+      1. templates 폴더 이동시 변경
+      2. `'DIRS': [BASE_DIR / '프로젝트명', 'templates']`
+         1. templates는 변경 불가
+6. app 생성 
+   1. `python manage.py startapp 앱이름`
+   2. urls.py 생성 및 urlpatterns 추가
+   3. settings에 installed_apps 앱 추가
+7. DB 정의 후 Django model 선언
+8. Serializers 설정
+9. `$ python manage.py makemigrations`
+10. `$ python manage.py migrate`
+   1. 쿼리 보기 -> `$ python manage.py sqlmigrate 앱명 마이그레이트 파일명`
+11. settings 설정 (debug_toolbar, 개발환경 구성 분리, db설정,  CORS 설정, timezone, root_url, static_url등 수정)
 
 
 
 ### frontend
 
-1. frontend 디렉토리 생성 후 이동 `mkdir frontend`, `cd frontend/`
-2. ` npm install -g create-react-app # 글로벌로 cra 설치`
-3. `create-react-app '앱이름'`
-4. `cd 앱이름`
-5. `npm start`
+1. frontend 디렉토리 생성 후 이동 `$ mkdir frontend`, `$ cd frontend/`
+2. `$  npm install -g create-react-app # 글로벌로 cra 설치`
+3. `$ create-react-app '앱이름'`
+4. `$ cd 앱이름`
+5. `$ npm start`
 
 
 
+## django project 명령어
+
+```
+# 장고 프로젝트 생성
+$ django-admin startproject 프로젝트명
+
+# db 마이그레이션 파일 생성
+$ python manage.py makemigrations (appName)
+
+# db 마이그레이션 적용
+$ python manage.py migrate (appName)
+
+# 사용자 유저 객체 관리를 위한 슈퍼유저 생성 (admin에서 사용 가능)
+$ python manage.py createsuperuser
+
+#서버 시작 명령
+$ python manage.py runserver
+
+#장고 앱 생성
+$ python manage.py startapp 앱이름
+
+#개발환경 변화에 따라 대처하기 위해 현 프로젝트의 패키지를 기록하는 명령어
+$ pip freeze > requirements.txt
+
+#requirements 파일에 있는 패키지 설치 (프로젝트는 왠만하면 깨끗한 상태에서 실행)
+$ pip install -r requirements.txt
+```
 
 
 
+## Reference
 
-# 장고 프로젝트 세팅
+- https://blog.hannal.com/2015/04/start_with_django_webframework_06/
+- https://educast.com/course/web/ZU53/
 
-
-
-## 1. 프로젝트 생성
-
-1. 프로젝트 생성 
-   1. 생성 후 프로젝트명 config로 변경하기
-      1. urls -> root_urls 변경 후 url 각 앱별로 분기하기
-   2. settings 패키지 생성(settings -> local, development 구분)
-      1. local.py setting 값 변경
-         1. root_urlconf, static_url, installed_apps, templates 설정 등등
-   3. config app에 common 폴더 생성(secret key 담기)
-   4. tempplates에 각 페이지별 html 담기
-      1. static -> css, js, api, plugin, assets등등
-   5. templatetags 패키지 생성
-      1. common_tags(html dom 운용)
-2. 각 기능별 앱 생성
-   1. `python manage.py startapp account`
-3. 프로젝트 구조 나누기
-   1. 각 앱별로 views, urls, models, apps 나누기
-   2. views에 list, get, post, put, delete, 등 선언
-4. secret key 설정
-5. settings 파일(local) 설정 변경하기
-   1. installed_apps 에 생성한 앱 등록
-   2. language_code = ko-kr
-   3. time_zone asia/seoul
-   4. templates dirs 설정
-   5. root_urlconf 설정
-6. manage.py와 wsgi.py에  setdefault 설정 local.py dir
-   1. `os.environ.setdefault()`
-7. requirements.txt 작성
-   1. `pip freeze > requirements.txt`
-8. model 작성
-9. `python manage.py makemigrations`
-10. `python manage.py migrate`
-
-
-
-base
-
-- development
-
-- production 
-
-## References
-
-- 
