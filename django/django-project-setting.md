@@ -28,6 +28,9 @@
 5. settings.py 설정(dev, prod 분리)
    1. settings 개발 환경 분리(settings 폴더 생성)
       1. settings/settings(base).py, settings/dev.py, settings/prod.py
+         1. `import *` (안티패턴이지만 settings에서만 예외 적용
+      2. `asgi.py, wsgi.py setdefault: prod`
+      3. `manage.py setdefault: dev`
    2. settings.py static 설정 추가
       1. `STATIC_URL = '/static/'`
          1. 웹 페이지에서 사용할 정적 파일의 최상위 URL 경로로 경로 자체는 실제 파일이나 디렉토리가 아니며 순수 URL로만 존재하는 단위입니다. 사용자가 임의로 변경이 가능하며 반드시 문자열로 구성되어 /로 끝나야 합니다.
@@ -45,22 +48,35 @@
          2. STATIC_ROOT와 다른 경로로 지정해야 합니다.
    3. TEMPLATES 설정
       1. templates 폴더 이동시 변경
-      2. `'DIRS': [BASE_DIR / '프로젝트명', 'templates']`
+      2. `'DIRS': os.path.join(BASE_DIR, 'config', 'templates')`
          1. templates는 변경 불가
-6. app 생성 
+6. DB Migration
+   1. `$ python manage.py migrate`
+7. urls 개발 debug 및 static 분기
+   1. setting.DEBUG True일때 path url에 debug_toolbar.urls 및 static url 패턴 추가
+      1. `$ pip install django-debug-toolbar` 설치
+         1. [debug-toolbar-setting-guide](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#setting-up-urlconf)
+      2. static -> `static(media_url='' , document_root='')` 설정
+8. superuser 생성
+   1. `$ python manage.py createsuperuser`
+9. app 생성 
    1. `python manage.py startapp 앱이름`
    2. urls.py 생성 및 urlpatterns 추가
    3. settings에 installed_apps 앱 추가
-7. DB 정의 후 Django model 선언
-8. Serializers 설정
-9. `$ python manage.py makemigrations`
-10. `$ python manage.py migrate`
-   1. 쿼리 보기 -> `$ python manage.py sqlmigrate 앱명 마이그레이트 파일명`
-11. settings 설정 (debug_toolbar, 개발환경 구성 분리, db설정,  CORS 설정, timezone, root_url, static_url등 수정)
+10. DB 정의 후 Django model 선언
+11. Serializers 설정
+12. `$ python manage.py makemigrations`
+13. `$ python manage.py migrate`
+    1. 쿼리 보기 -> `$ python manage.py sqlmigrate 앱명 마이그레이트 파일명`
+14. settings 설정 (debug_toolbar, 개발환경 구성 분리, db설정,  CORS 설정, timezone, root_url, static_url등 수정)
 
 
 
-### frontend
+![스크린샷 2021-01-17 오후 5 24 41](https://user-images.githubusercontent.com/48043799/104835323-236e7d80-58e9-11eb-8dcc-f5082b6f8720.png)
+
+> Project Setting
+
+### frontend 추가시
 
 1. frontend 디렉토리 생성 후 이동 `$ mkdir frontend`, `$ cd frontend/`
 2. `$  npm install -g create-react-app # 글로벌로 cra 설치`
