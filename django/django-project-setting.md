@@ -48,7 +48,7 @@
          2. STATIC_ROOT와 다른 경로로 지정해야 합니다.
    3. TEMPLATES 설정
       1. templates 폴더 이동시 변경
-      2. `'DIRS': os.path.join(BASE_DIR, 'config', 'templates')`
+      2. `'DIRS': [os.path.join(BASE_DIR, 'config', 'templates')]`
          1. templates는 변경 불가
 6. DB Migration
    1. `$ python manage.py migrate`
