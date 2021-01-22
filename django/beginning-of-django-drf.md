@@ -208,6 +208,40 @@ GenericAPIView(views.APIView) 상속 (query_set, serializer_classe) 등
 
 method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
+### render: 직렬화 클래스
+
+- JSONRenderer: JSON 직렬화
+- TemplateHTMLRenderer: HTML 페이지 직렬화
+
+### parser: 비직렬화 클래스
+
+- JSONparser 포맷 처리
+- Formparser
+- Multipartparser
+
+### authentication: 인증 클래스
+
+- sessionAuthentication: 세션기반 인증
+- BasicAuthentication: http basic 인증
+
+### throttle : 요청 제한 클래스
+
+- 빈 듀플(default setting x)
+
+### permission: 권한 클래스
+
+- PermissionsAllowAny: 모두 접근 가능
+
+### content_negotiation: 요청에 따른 직렬화 비직렬화 선택
+
+- DefaultContentNegotiation: 동일 URL 요청이지만 JSON response인지 HTML response 인지 체크
+
+### metadata: 메타정보 처리 클래스
+
+- SimpleMetadata
+
+### versioning: 요청에 api 버전 정보 탐색 클래스
+
 
 
 ## Reference
