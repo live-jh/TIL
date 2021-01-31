@@ -2,48 +2,63 @@
 
 
 
-## IAM
+## Region
 
-Identiyu and Access Management(식별 및 접근관리)라는 뜻으로 사용자 또는 사용자별 그룹을 생성하여 AWS의 각 리소스(자원)에 대해 제어 및 권한 관리를 제공하는 것을 말합니다. IAM은 실제 서비스를 제공하는 AWS 자체 리소스가 아니라 사용 요금을 발생하지 않습니다.
+Geographical Area (each Region consists of 2(or more) Availability Zones) (지리적 영역)
+
+## AZ
+
+- Think of an Availability Zone as A Data Center
+- isolated locations within each Region.
+- Multiple
+
+## Edge Locations
+
+- Endpoints for aws which are user for caching content.
+- typically this consists fo CloudFront, amazon's content Delivery Network
+
+> Edge Locations > AZ's > Regions (갯수 기준)
+
+## IAM Offers
+
+- Centralised control of your AWS account (중앙 집중)
+- Shared Access to your AWS account (공유 엑세스 권한)
+- Granular Permissions (세분화 권한)
+- Identity Federation (신원 제공)
+- Multifactor Authentication (다중 인증)
+- Provide temporary access for users/devices and services where necessary (임시 엑세스 제공)
+- Allows you to set up your own password rotation policy (기간 주기로 패스워드 교체)
+- Integrates with many different AWS services (다양한 aws 서비스 통합)
+- Supports PCI DSS Compliance (framework)
+- IAM is `universal` (지역 설정 x)
+- `"root account"` is simply the account created when first setup your AWS account (처음 생성한 aws의 계정이 root 사용자)
+- New Users have `No permissions` when first created (새 사용자 권한 없음)
+- New Users are assigned Access Key ID & Secret Access Keys when first created (유저 생성시 엑세스키, 비밀 엑세스키 할당)
+  - `These are not the same as a password`. you can't user the access Key ID & Secret Access Key to Login in to the console. (위에 두 키는 다르며 이를 통해 콘솔에 로그인 불가)
+  - `You only get to view these once.` If you lose them, you have to regenerate them. so save them in a secure location(일회용으로 잃어버릴시 복구 불가)
+- Always setup Multifactor Authentication on your root account(root 계정 MFA 인증 설정 -> 안정적 운영)
+
+Identity and Access Management(식별 및 접근관리)라는 뜻으로 사용자 또는 사용자별 그룹을 생성하여 AWS의 각 리소스(자원)에 대해 제어 및 권한 관리를 제공하는 것을 말합니다. IAM은 실제 서비스를 제공하는 AWS 자체 리소스가 아니라 사용 요금을 발생하지 않습니다.
 
 IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 관리할 수 있거나, 다른 AIM의 사용자는 S3의 내용만 읽을 수 있도록 구성할 수 있습니다. 개인 사용자와 달리 사용자 그룹은 동일한 권한을 여러 IAM 사용자에게 부여할 때 사용합니다.
 
 ![te](https://user-images.githubusercontent.com/48043799/105719346-87d2b200-5f65-11eb-8b14-45de1b8fe7b7.png)
 
-> IAM 개념 설명 이미지
+> IAM Concept IMG
 
 
 
-## IAM 용어
+## IAM Terminology
 
-- Group: 그룹
-  - 하나의 그룹은 하나 또는 다수의 유저가 존재
-- User: 사용자
-- Role: 역할
-  - 하나 또는 다수의 정책 지정
-- Policy: 정책
-  - json으로 이루어진 document이며, 세밀한 접근 권한을 지정
-  - 정책은 그룹, 역할에 추가 가능
-
-
-
-## 요약
-
-- 정책은 지역에 적용되지 않습니다.
-- root 계정은 aws 처음 설정시 생성된 계정으로 완전한 관리자 권한을 가지고 있습니다.
-- 새 사용자는 처음 생성시 권한이 존재하지 않습니다.
-  - 새 사용자를 생성시 해당 사용자에게 권한을 부여해야합니다.
-- S3를 볼때 버킷을 생성시 잠겨있으므로 해당 객체를 공개헤야 접근이 가능합니다.
-- 새 사용자에게는 access key와 ID 보안 access key가 할당되는데 이는 로그인때 사용하는 것이 아니라 API와 커맨드 명령으로 aws에 접근할때만 사용합니다.
-- 또한 사용자를 위한 암호 정책을 생성하고 이를 지정할수도 있습니다.
-- S3는 객체 기반 서비스입니다.
-- S3는 파일은 최대 5TB까지 업로드 가능하며 버킷이라는 곳에 파일을 저장합니다.
-- S3의 버킷 이름은 고유한 이름을 사용해야하며 업로드 성공시 200 상태코드를 리턴합니다.
-- S3 기본 생성시 default로 버킷은 비공개입니다.
-- S3 버킷은 버킷 정책을 사용하여 액세스 제어를 설정할 수 있으며 버킷단위가 아닌 파일 개별적으로도 지정이 가능합니다.
-- S3 버킷은 액세스 로그를 생성할 수 있으며 aws계정내에 A라는 버킷에서 B 버킷으로 전송할 수 있습니다.
-- S3 스토리지 클래스중 S3 standard는 드물게 접근합니다.
-  - S3 Standard > IA > One Zone IA(자주 접근) > Intelligent Tiering > Glacier > Glacier Deep Archive
+- Group: A collection of users (permissions of the group)
+  - 그룹 사용자의 권한 설정
+- User: End Users such as people (employees)
+  - 사용자 혹은 조직, 팀원
+- Role: create roles & assign them to aws resources
+  - 역할 생성 및 자원 할당
+- Policies: Policy documents (JSON format) 
+  - they give permissions as to what a user/group/role is able to do
+  - 사용자, 그룹, 역할에 권한 추가 및 제거
 
 
 
@@ -174,7 +189,7 @@ Eventual Consistency(UPDATE, DELETE)
 
 ### [S3 요금](https://aws.amazon.com/ko/s3/pricing/)
 
-![image-20210128000511195](/Users/lj/Library/Application Support/typora-user-images/image-20210128000511195.png)
+![image](https://user-images.githubusercontent.com/48043799/106135815-c5c11780-61ab-11eb-8902-a33cc7419f94.png)
 
 ### 적합한 S3 버킷 사용 방법 (아래로 갈수록 절약)
 
@@ -239,6 +254,28 @@ default 아무런 동작하지 않을시 (서버측 유형)
 > 3. A라는 사용자가 엣지로케이션에 대한 쿼리를 수행 또는 비디오 파일 요청 (캐싱 여부 확인)
 > 4. 해당 위치에 사본이 없을시 원본 서버로 비디오를 다운로드 요청, 요청이 끝난 후 엣지 서버에 캐싱 처리와 동시에 응답
 > 5. 이후 접근시 캐시가 되어진 위치로 우선 접근하여 있는지 확인후 존재한다면 캐시데이터로 처리, 아니라면 다시 원본 서버로 접근 
+
+
+
+## 요약
+
+- 정책은 지역에 적용되지 않습니다.
+- root 계정은 aws 처음 설정시 생성된 계정으로 완전한 관리자 권한을 가지고 있습니다.
+- 새 사용자는 처음 생성시 권한이 존재하지 않습니다.
+  - 새 사용자를 생성시 해당 사용자에게 권한을 부여해야합니다.
+- S3를 볼때 버킷을 생성시 잠겨있으므로 해당 객체를 공개헤야 접근이 가능합니다.
+- 새 사용자에게는 access key와 ID 보안 access key가 할당되는데 이는 로그인때 사용하는 것이 아니라 API와 커맨드 명령으로 aws에 접근할때만 사용합니다.
+- 또한 사용자를 위한 암호 정책을 생성하고 이를 지정할수도 있습니다.
+- S3는 객체 기반 서비스입니다.
+- S3는 파일은 최대 5TB까지 업로드 가능하며 버킷이라는 곳에 파일을 저장합니다.
+- S3의 버킷 이름은 고유한 이름을 사용해야하며 업로드 성공시 200 상태코드를 리턴합니다.
+- S3 기본 생성시 default로 버킷은 비공개입니다.
+- S3 버킷은 버킷 정책을 사용하여 액세스 제어를 설정할 수 있으며 버킷단위가 아닌 파일 개별적으로도 지정이 가능합니다.
+- S3 버킷은 액세스 로그를 생성할 수 있으며 aws계정내에 A라는 버킷에서 B 버킷으로 전송할 수 있습니다.
+- S3 스토리지 클래스중 S3 standard는 드물게 접근합니다.
+  - S3 Standard > IA > One Zone IA > Intelligent Tiering > Glacier > Glacier Deep Archive
+
+
 
 
 
