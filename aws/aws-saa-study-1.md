@@ -107,7 +107,20 @@ IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 �
 - 99.99% availability
 - stored redundantly across multiple devies in multiple facilities, and is designed to sustain the loss of 2 facilities concurrently.
 
+### S3 - IA
 
+- for data that is accessed less frequently but requires rapid access when needed lwoer fee tahn se but you are charged a retrieval fee
+  - 엑세스 빈도 낮음, 필요한 경우 빠른 엑세스 -> 검색 수수료 부과
+
+### S3 One Zone - IA
+
+- for where you want a lower-cost option for infrequently accessed data but do not require the multiple availability zone data resilience
+  - 자주 액세스하지 않는 데이터에 대한 효율적 옵션을 제공 다중 AZ 복원은 비제공
+
+### S3 - Intelligent Tiering
+
+- Designed to optimize costs by automatically moving data to the most cost-effective access tier, without performance impact or operational overhead
+  - 운영 처리시간 대비 가장 가성비 좋은 액세스 계층으로 데이터를 자동으로 이동하여 비용을 최적화 설계
 
 
 
