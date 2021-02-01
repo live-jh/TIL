@@ -60,6 +60,55 @@ IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 �
   - they give permissions as to what a user/group/role is able to do
   - 사용자, 그룹, 역할에 권한 추가 및 제거
 
+## S3
+
+- S3 is a safe place to `store your files` (파일 저장소)
+  - 안전하고 가변적 object 저장공간 제공(간단한 웹 서비스 인터페이스)
+- `Object-based` storage (객체 기반)
+- data spread across multiple devices and facilities (여러 장치 분산 데이터)
+- Files can be from `0Bytes ~ 5TB` (파일 저장 범위)
+- unlimited storage and Files are stored in buckets (버킷에 저장되며 무제한)
+- `universal namespace` (unique globally) (전역 네임스페이스)
+- upload file to S3 -> receive a `HTTP 200 code` (success)
+
+### S3 Objects 
+
+- Key (simply name)
+- Value (simply data & made up of a sequence of bytes) 
+- Version ID (important versioning)
+- Metadata (additional information)
+- SubResouirces (Access Control Lists, Torrent)
+  - CORS(Cross Origin Resource Sharing): 한 버킷의 파일을 다른 버킷에서 접근 가능하도록 하는 기능(다른 지역에서도 가능)
+
+### Consistency work for S3 (데이터 일관성)
+
+- Read after write consistency for PUTS of new Objects 
+  - S3 버킷에 **업로드한다면 즉시 바로 사용**할 수 있다는 의미
+- Eventual Consistency  for overwrite PUTS and DELETES 
+  - 버킷의 내용을 **수정(덮어쓰기)하거나 삭제할시** 복제하는데 시간이 걸리는 의미
+
+> if you write a new file and read it immediately afterwards you will be able to view that data. (새 파일 업로드시 즉시 파일을 read 가능)
+>
+> if you update an existing file or delete a file and read it immediately you may get the older version, or you may not. basically changes to objects can take a little bit of time to propagate (기존 파일을 덮어쓰기 또는 삭제한다면 이전 버전의 파일 또는 아예 없는 경우도 발생하며 기본적으로 객체의 변경사항은 약간의 시간이 소요)
+
+### S3 features
+
+- Tiered Storage Available
+- Lifecycle Management
+- Versioning
+- Encryption
+- MFA Delete
+- Secure your data using Access Control Lists and Bucket Policies
+
+## S3 Storage Classes
+
+### S3 Standard (default)
+
+- 99.99% availability
+- stored redundantly across multiple devies in multiple facilities, and is designed to sustain the loss of 2 facilities concurrently.
+
+
+
 
 
 ## Cloud watch
@@ -69,6 +118,10 @@ AWS 리소스 사용의 실시간 모니터링을 지원합니다.
 모니터링 및 감시하는 방법으로 청구에 따른 경보를 지정할 수 있으며, 다양한 이벤트를 로그파일로 저장할 수 있으며 경보 설정을 통해 SNS, lambda로 전송이 가능합니다.
 
 CloudWatch를 사용 가능한 서비스로는 EC2, RDS, S3, ELB등이 있습니다.
+
+# 실습
+
+## Cloud Watch
 
 알람은 지역을 버지니아 북부로 설정해야 지정이 가능하며 다음과 같이 설정할 수 있습니다.
 
@@ -102,34 +155,6 @@ CloudWatch를 사용 가능한 서비스로는 EC2, RDS, S3, ELB등이 있습니
 ![image](https://user-images.githubusercontent.com/48043799/105858302-7ef9e300-602e-11eb-8457-7f9b9c1f3083.png)
 
 
-
-## S3(Simple Storage Service)
-
-aws에서 가장 오래된 서비스이며 글로벌 서비스로 지역을 선택하지 않아도 이용 가능합니다.
-
-- 안전하고 가변적 object 저장공간 제공(간단한 웹 서비스 인터페이스)
-- 편리한 UI를 통해 쉽게 데이터를 저장하고 조회 가능
-- 파일 크기는 0~5TB까지 지원
-- 저장공간은 무제한
-- Bucket이라는 이름을 사용하며 보편적 namepace를 사용
-
-### S3의 Object 구성요소
-
-- Key: 객체의 이름
-- Value: 파일 자체의 데이터
-- Version ID: 버전관리에 필요한 버전 ID (S3의 고유 특징)
-- Metadata: 데이터의 데이터
-- CORS(Cross Origin Resource Sharing): 한 버킷의 파일을 다른 버킷에서 접근 가능하도록 하는 기능(다른 지역에서도 가능)
-
-### Consistency Model
-
-Read After Write Consistency(PUT)
-
-- S3파일 업로드시 PUT을 사용, S3 버킷에 **업로드한다면 즉시 바로 사용**할 수 있다는 의미
-
-Eventual Consistency(UPDATE, DELETE)
-
-- 버킷의 내용을 **수정하거나 삭제할시** 결과가 바로 나타나지 않는 기능
 
 ### S3 생성
 
