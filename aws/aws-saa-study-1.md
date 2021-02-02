@@ -122,6 +122,53 @@ IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 �
 - Designed to optimize costs by automatically moving data to the most cost-effective access tier, without performance impact or operational overhead
   - 운영 처리시간 대비 가장 가성비 좋은 액세스 계층으로 데이터를 자동으로 이동하여 비용을 최적화 설계
 
+### how to get the best value out of S3
+
+> S3 Standard > S3 - IA > S3 Intelligent Tiering > S3 One Zone - IA > S3 Glacier > S3 Glacier Deep Archive
+
+## S3 Security
+
+by default all newly created buckets are private. you can setup access control to your buckets using (default -> **private**)
+
+- Bucket Policies
+- Access Control Lists
+
+ can be configured to create access log which log all requests made to the s3 bucket.  can be sent to another bucket and another bucket in another account.
+
+## S3 Entryption
+
+### Encryption in transit
+
+- Achieved by **SSL/TLS**
+
+### Encryption at rest(server side)
+
+- S3 Managed Keys -> SSE-S3
+- AWS Key Management Service, Managed keys -> SSE-KMS
+- Server Side Encryption with Customer Provided Keys -> SSE-C
+
+### Client Side Encryption
+
+![image](https://user-images.githubusercontent.com/48043799/106614870-318df080-65af-11eb-94bc-330db8ab5355.png)
+
+> 자료를 누구에게 주는지 | 비밀키를 보관하는 측 | 비밀키를 관리하는 측
+>
+> Server Side Encryption
+>
+> - Server side encryption with Amazon S3 Managed Keys (SSE-S3)
+>   - 고유한 키를 사용하여 암호화 및 주기적 업데이트를 반영한 마스터키를 사용하여 키 자체 암호화
+>   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/UsingServerSideEncryption.html)
+> - Server side encryption with KMS (SSE-KMS)
+>   - Key Management Service
+>   - 데이터를 받은 애플리케이션 또는 서비스내에서 데이터를 암호화, 고객 마스터키(CMK)를 활용해 S3 객체를 암호화(메타 데이터 암호화 x)
+>   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/UsingKMSEncryption.html)
+> - Server side encryption with Customer Provided Keys (SSE-C)
+>   - 고객 제공키를 사용한 서버측 암호화
+>   - 사용자는 암호화 키 관리 S3를 암호화 및 해독 관리
+>   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/ServerSideEncryptionCustomerKeys.html)
+
+
+
 
 
 ## Cloud watch
