@@ -9,13 +9,13 @@ Geographical Area (each Region consists of 2(or more) Availability Zones) (지�
 ## AZ
 
 - Think of an Availability Zone as A Data Center
-- isolated locations within each Region.
+- isolated locations within each Region (각 지역내 독립된 위치)
 - Multiple
 
 ## Edge Locations
 
 - Endpoints for aws which are user for caching content.
-- typically this consists fo CloudFront, amazon's content Delivery Network
+- typically this consists for CloudFront, amazon's Content Delivery Network (일반적으로 CDN, CloudFront 캐싱 구성)
 
 > Edge Locations > AZ's > Regions (갯수 기준)
 
@@ -26,7 +26,7 @@ Geographical Area (each Region consists of 2(or more) Availability Zones) (지�
 - Granular Permissions (세분화 권한)
 - Identity Federation (신원 제공)
 - Multifactor Authentication (다중 인증)
-- Provide temporary access for users/devices and services where necessary (임시 엑세스 제공)
+- Provide temporary access for users/devices and services where necessary (필요한 경우 임시 엑세스 제공)
 - Allows you to set up your own password rotation policy (기간 주기로 패스워드 교체)
 - Integrates with many different AWS services (다양한 aws 서비스 통합)
 - Supports PCI DSS Compliance (framework)
@@ -102,14 +102,20 @@ IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 �
 
 ## S3 Storage Classes
 
+<img width="982" alt="s3" src="https://user-images.githubusercontent.com/48043799/106619999-7ec09100-65b4-11eb-96ba-c672f69176f2.png">
+
+## Storage Price![image](https://user-images.githubusercontent.com/48043799/106620292-c6dfb380-65b4-11eb-9c69-c92b23bb1a50.png)
+
+![image](https://user-images.githubusercontent.com/48043799/106620330-d0691b80-65b4-11eb-886f-c523838793c1.png)
+
 ### S3 Standard (default)
 
 - 99.99% availability
-- stored redundantly across multiple devies in multiple facilities, and is designed to sustain the loss of 2 facilities concurrently.
+- stored redundantly across multiple devices in multiple facilities, and is designed to sustain the loss of 2 facilities concurrently.
 
 ### S3 - IA
 
-- for data that is accessed less frequently but requires rapid access when needed lwoer fee tahn se but you are charged a retrieval fee
+- for data that is accessed less frequently but requires rapid access when needed lower fee than S3 but you are charged a retrieval fee
   - 엑세스 빈도 낮음, 필요한 경우 빠른 엑세스 -> 검색 수수료 부과
 
 ### S3 One Zone - IA
@@ -130,12 +136,12 @@ IAM의 기능을 예로 들자면 A라는 IAM의 설정된 사용자는 EC2만 �
 
 by default all newly created buckets are private. you can setup access control to your buckets using (default -> **private**)
 
-- Bucket Policies
-- Access Control Lists
+- Bucket Policies (JSON format)
+- Access Control Lists (ACL: simple way of granting access 간단방법) 
 
  can be configured to create access log which log all requests made to the s3 bucket.  can be sent to another bucket and another bucket in another account.
 
-## S3 Entryption
+## S3 Entryption (file down&upload)
 
 ### Encryption in transit
 
@@ -156,20 +162,98 @@ by default all newly created buckets are private. you can setup access control t
 > Server Side Encryption
 >
 > - Server side encryption with Amazon S3 Managed Keys (SSE-S3)
->   - 고유한 키를 사용하여 암호화 및 주기적 업데이트를 반영한 마스터키를 사용하여 키 자체 암호화
+>   - 고유한 키를 사용하여 암호화 및 주기적 업데이트를 반영한 마스터키를 사용하여 키 자체 암호화, 아마존이 모든 키를 관리
 >   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/UsingServerSideEncryption.html)
 > - Server side encryption with KMS (SSE-KMS)
 >   - Key Management Service
->   - 데이터를 받은 애플리케이션 또는 서비스내에서 데이터를 암호화, 고객 마스터키(CMK)를 활용해 S3 객체를 암호화(메타 데이터 암호화 x)
+>   - 데이터를 받은 애플리케이션 또는 서비스내에서 데이터를 암호화, 고객 마스터키(CMK)를 활용해 S3 객체를 암호화(메타 데이터 암호화 x),  아마존과 함께 키관리
 >   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/UsingKMSEncryption.html)
 > - Server side encryption with Customer Provided Keys (SSE-C)
->   - 고객 제공키를 사용한 서버측 암호화
->   - 사용자는 암호화 키 관리 S3를 암호화 및 해독 관리
+>   - 고객이 amazon에 제공한 키를 사용해 서버측 암호화
+>   - 사용자는 암호화 키만 관리,  S3를 통해 S3 객체 암호화 및 해독 관리
 >   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/ServerSideEncryptionCustomerKeys.html)
 
 
 
+## S3 Versioning
 
+- All versions of an object(including all writes and even if you delete)
+  - 쓰기 및 삭제하더라도 객체의 모든 버전 관리 가능
+- backup tool (great!)
+- once enabled, **versioning cannot be disabled**, **only suspended**
+- Integrates with lifecycle rules (통합 라이프사이클)
+- uses multi-factor authentication can be used to provide an additional layer of security(MFA)
+  - 다중 요소인증을 통해 MFA 추가 보안 계층 제공 가능
+
+## S3 Object Lock
+
+> You can use S3 object lock to store objects using a write once, read many model. (여러 모델 또는 한번의 쓰기 사용으로 객체 저장)
+> it can help u prevent objects from being deleted or modified for a fixed amount of time or indefinitely (고정시간 또는 무기한으로 객체 삭제 및 수정 방지 )
+>
+>  to add an extra protection against object changes and deletion (객체의 변경 및 삭제에 대한 추가 보호)
+
+## Governance Mode & Compliance Mode
+
+### Governance Mode
+
+- User can't overwrite or delete an object version or alter its lock
+  - 사용자가 특별한 권한이 없는 경우 객체 버전을 덮어쓰거나 삭제 및 잠금 변경 불가
+- protect objects against being deleted by most users, but u can still grant some users permission to alter the retention settings or delete the object **if necessary**
+  - 필요한경우 객체를 삭제 권한 부여 가능 (일반적으로 객체를 삭제하지 않도록 보호)
+
+### Compliance Mode
+
+- Protected object version can't be overwritten or deleted by any user, including the root user
+  - 루트 사용자를 포함해 어떤 사용자도 덮어쓰거나 수정 삭제 불가
+- ensures an object version can't be overwritten or deleted for the duration of the retention period
+  - 보존 기간동안 객체의 버전 및 수정 삭제가 불가
+
+## 
+
+## Glacier Valut Lock
+
+> easily deploy and enforce compliance controls for individual S3 Glacier vaults with a Vault Lock policy. you can **specify controls, such as worm, in a vault lock policy and lock the pllicy from future edits**. once locked, the policy can no longer be changed.
+>
+> 볼트 잠금정책, 개별 S3 Glacier 볼트에 대한 제어를 통해 쉽게 배포하고 적용 가능, 웜과 같은 컨트롤 지정, 이후 편집시 정책을 잠금 가능 (잠길시 정책 변경 불가)
+
+
+
+## S3 limitation when using kms
+
+- Using SSE-KMS to encrypt your objects in s3, you must keep in mind the kms limits
+- Upload a file, you will call GenerateDatakey in the KMS API
+- Download a file, youy will call Decrypt in the KMS API
+
+
+
+## AWS Organizations
+
+- paying account is for billing purposes only. Don't deploy resources into paying account.
+  - 지불 계정에 자원 배포 x
+- always use **MFA**, strong and complex password on root account
+  - 루트 계정에 늘 MFA 및 복잡한 암호 설정
+- always enable multi-factor authentication on root account
+  - 다중 요소 인증 사용
+- enable/disable AWS services using SCP(Service Control Policies) either on OU or on individual accounts.
+  - SCP 정책을 사용하여 aws 서비스 활성, 비활성 설정
+
+
+
+## S3 Transfer Acceleration
+
+- You can speed up transfers to S3 using S3 transfer acceleration. This costs extra and has the greatest impact on people who are in a faraway location
+
+  - S3 가속을 통해 전송 속도를 상승, 추가비용 및 먼 지역까지 적용 가능
+
+- Transfer Acceleration takes advantage of AWS Cloudfront's globally distributed edge locations. As the data arrives at an edge location, data is routed to AWS S3 over an optimized network path.
+
+  - 데이터가 전세계에 분산된 엣지 위치에 도착하면 최적화된 네트워크 경로를 통해 S3로 라우팅
+
+- Instead of directly uploading the file to S3 bucket, you will get a distinct URL that will upload the data to the nearest edge location 
+
+  - S3 버킷에 직접 업로드, 가장 가까운 엣지 위치에 데이터 고유 URL 사용 가능
+
+  
 
 ## Cloud watch
 
@@ -285,18 +369,12 @@ CloudWatch를 사용 가능한 서비스로는 EC2, RDS, S3, ELB등이 있습니
 - S3 Glacier
 - S3 Glacier Deep Archive
 
-## S3 암호화
+## S3 Encryption Practice
 
 파일 업로드/다운로드시
 
 - SSL/TLS -> aws 내부적으로 암호화
   - 서버측, 클라이언트측에서 지원할 수 있으며 서버측은 아마존이 객체 암호화를 클라이언트측은 객체를 암호화 후 S3에 업로드합니다.
-
-default 아무런 동작하지 않을시 (서버측 유형)
-
-- SEE-S3: aws에서 자동으로 키관리 
-- SSE-KMS: 키관리 서비스
-- SSE-C: 고객이 제공한 키를 사용해 서버측 암호화 수행
 
 ![image](https://user-images.githubusercontent.com/48043799/106011918-432e4e80-60fe-11eb-9749-7ee3072bd3a8.png)
 
