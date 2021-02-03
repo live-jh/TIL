@@ -263,6 +263,12 @@ AWS 리소스 사용의 실시간 모니터링을 지원합니다.
 
 CloudWatch를 사용 가능한 서비스로는 EC2, RDS, S3, ELB등이 있습니다.
 
+
+
+
+
+
+
 # 실습
 
 ## Cloud Watch
