@@ -63,7 +63,82 @@
 - EBS Root Volumes of Default AMI's **Can** be encrypted (AMI 루트 볼륨 암호화 가능)
 - additional volumes can be encrypted (추가 볼륨 암호화 가능)
 
-<br>
+
+
+## EC2 콘솔 메뉴
+
+### Description (설명)
+
+- 종료 방지 -> Termination protection = True (on)
+- public DNS 주소 확인 가능
+
+### Status Checks (상태)
+
+- 시스템 확인, 인스턴스 확인
+
+### Monitoring
+
+- Cloud Watch를 통해 자세한 사항 확인
+- CPI 상태, 네트워크등 확인
+
+### Tag
+
+- EC2 생성시 설정했던 내용 확인
+
+### Actions
+
+- EC2 서버 연결
+- 인스턴스 상태 변경(start, stop, reboot, terminate)
+- Instance Settings - 인스턴스 설정 변경
+  - edit tag
+  - auto scaling
+  - add role
+  - change termination protection
+
+## EC2 Tips
+
+- Termination Protection is turned off by default, you must turn it on
+  - 기본적으로 종료방지 기능은 꺼져있고, 실행시 켜야함
+- On an EBS-backed instance, the default action is for the root EBS volume to be deleted when the instance is terminated
+  - EBS 인스턴스는 종료시 Root EBS 볼륨 삭제
+
+
+
+## Quiz
+
+Q1. If an Amazon EBS volume is the root device of an instance, can I detach it without stopping the instance?
+
+a. Yes but only if Windows instance
+b. No
+c. Yes
+d. Yes but only if a Linux instance
+
+
+
+Q2. 한 회사가 예약 인스턴스를 사용하여 데이터-처리 워크로드를 실행한다. 야간 작업은 보통 실행에 7 시간이 걸리며 10 시간 내에 완료되어야만 한다. 이 회사는 매월 말 일시적인 수요 증가가 예상되며 현재의 자원 용량으로는 이 작업의 시간 제한 초과 원인이 될 것이다. 처리 작업은 일단 시작되면 완료되기 전에 중단될 수 없다. 이 회사는 가능한 한 비용-효율적으로 용량을 늘릴 수 있는 솔루션을 구현하고 싶어한다. 어떤 것을 솔루션 아키텍트가 해야하는가? 
+
+a. 수요가 많은 기간 동안 온디맨드 인스턴스를 배포한다.
+b. 추가적인 인스턴스를 위해 두 번째 Amazon EC2 예약을 생성한다.
+c. 수요가 많은 기간 동안 스팟 인스턴스를 배포한다.
+d. 증가된 워크로드의 지원을 위해 Amazon EC2 예약에서 인스턴스의 인스턴스 크기를 늘린다.
+
+
+
+Q3. 한 회사의 보안 팀은 클라우드에 저장된 모든 데이터가 온프레미스에 저장된 암호화 키를 사용하여 항상 암호화될 것을 요구한다. 어느 암호화 옵션이 이러한 요구사항을 충족하는가? (2개  선택)
+
+a. Amazon S3 관리형 키(SSE-S3)의 서버 측 암호화를 사용한다.
+b. AWS KMS 관리형 키(SSE-KMS)의 서버 측 암호화를 사용한다.
+c. 고객 제공 키(SSE-C)의 서버 측 암호화를 사용한다.
+d. 클라이언트 측 암호화를 사용하여 저장 중 암호화를 제공한다. 
+e. Amazon S3 이벤트에 의해 구동되는 AWS Lambda 함수로 고객 키를 사용해 데이터를 암호화한다.
+
+>  Answer
+>
+> Q1: b
+>
+> Q2: a
+>
+> Q3: c, d
 
 ## References
 
