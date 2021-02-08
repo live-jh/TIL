@@ -192,7 +192,39 @@ T 시리즈들은 범용으로 사용되어지고 있습니다.
 >
 > 다른 장소로 이동시 해당 장소의 IP를 SSH 규칙에 추가하여 작업
 
+#### 1-7. 키 페어 생성
 
+AWS에 저장되는 퍼블릭, 사용자가 저장하여 관리하는 프라이빗 키로 구성됩니다. 이 두 키를 통해 SSH를 활용하여 인스턴스에 안전하게 접속하게 됩니다.
+
+![image](https://user-images.githubusercontent.com/48043799/107239642-6943df00-6a6c-11eb-8211-733c3118ba45.png)
+
+![image](https://user-images.githubusercontent.com/48043799/107240402-364e1b00-6a6d-11eb-9f55-c5c5420453de.png)
+
+> 생성된 프라이빗 키
+
+#### 1-8. 접속 방법 
+
+- 저장한 key.pem을 따로 관리할 디렉토리로 옮긴다.
+- 해당 key.pem의 권한 수정
+  - `$ CHMOD 400 myFirstAWSKeyPair.pem`
+- `$ ssh ec2-user@"퍼블릭 IPv4 주소" -i myFirstAWSKeyPair.pem`
+- 슈퍼 사용자 엑세스 권한으로 변경 후 yum update
+  - `$ sudo su`
+  - `$ yum update -y`
+- apache install
+  - `$ yum install httpd -y`
+- 아래 디렉토리로 이동
+
+![image](https://user-images.githubusercontent.com/48043799/107242923-d9079900-6a6f-11eb-97ea-bba7491c6773.png)
+
+- `$ nano index.html`
+  - html sample code
+  - 종료시: ctrl + x -> Y -> enter
+- `$ service httpd start` -> httpd 서비스 시작
+- `$ chkconfig on` -> 수동으로 인스턴스 재부팅
+- 해당 IP로 접속 :)
+
+![image](https://user-images.githubusercontent.com/48043799/107244917-e6be1e00-6a71-11eb-817e-9ebe5678bde1.png)
 
 <br>
 
