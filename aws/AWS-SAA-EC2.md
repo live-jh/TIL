@@ -213,12 +213,9 @@ AWS에 저장되는 퍼블릭, 사용자가 저장하여 관리하는 프라이�
   - `$ yum update -y`
 - apache install
   - `$ yum install httpd -y`
-- 아래 디렉토리로 이동
-
-![image](https://user-images.githubusercontent.com/48043799/107242923-d9079900-6a6f-11eb-97ea-bba7491c6773.png)
-
+- `$ cd /var/www/html` 
 - `$ nano index.html`
-  - html sample code
+- html sample code
   - 종료시: ctrl + x -> Y -> enter
 - `$ service httpd start` -> httpd 서비스 시작
 - `$ chkconfig on` -> 수동으로 인스턴스 재부팅
