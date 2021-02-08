@@ -140,6 +140,62 @@ e. Amazon S3 이벤트에 의해 구동되는 AWS Lambda 함수로 고객 키를
 >
 > Q3: c, d
 
+
+
+## 실습
+
+### 1. 인스턴스 생성
+
+#### 1-1. AMI(Amazon Machine Image)
+
+EC2 인스턴스를 시작할때 필요한 정보를 이미지로 만들어 둔 것들을 의미합니다. 인스턴스에 필요한 소프트웨어(가상머신) 구성을 지정합니다.
+
+![image](https://user-images.githubusercontent.com/48043799/107231985-41e91400-6a64-11eb-9df6-b427002808fc.png)
+
+Amazon Linux 1 AMI 지원 종료 이슈로 인해 Linux 2 AMI를 사용합니다. (더 많은 최신 기능을 포함한 AMI)
+
+#### 1-2. 인스턴스 유형 선택
+
+애플리케이션의 가상 서버로 CPU, 메모리, 스토리지(용량) 등을 선택할 수 있습니다.
+
+![image](https://user-images.githubusercontent.com/48043799/107231878-2978f980-6a64-11eb-96f1-418dfea846b0.png)
+
+T 시리즈들은 범용으로 사용되어지고 있습니다.
+
+#### 1-3. 인스턴스 세부 구성
+
+인스턴스에 대한 세부 정보 구성하는 페이지로 기업의 경우 VPC, 서브넷등 다양한 옵션을 지정하여 사용하지만 1인 개발일 경우는 대게 1대의 서버를 사용하니 큰 설정 없이 default 상태로 넘어갑니다.
+
+![image](https://user-images.githubusercontent.com/48043799/107232353-a86e3200-6a64-11eb-9062-440857255b5b.png)
+
+> 스팟 인스턴스, 인스턴스의 갯수, IAM 역할, CPU 갯수 지정, 종료 방식, 모니터링 설정, 용량 예약, 크레딧, 파일시스템등 다양한 설정 가능
+
+#### 1-4. 스토리지 구성
+
+흔히 생각하는 컴퓨터의 하드디스크와 같은 서버의 용량을 선택하는 단계입니다. 기본값은 8GB이며 프리티어 고객은 **최대 30GB**까지 범용 SSD 스토리지를 사용할 수 있습니다.
+
+![image](https://user-images.githubusercontent.com/48043799/107233252-ba9ca000-6a65-11eb-98f2-81b6083a4e3f.png)
+
+#### 1-5. 태그 추가
+
+![image](https://user-images.githubusercontent.com/48043799/107233522-08190d00-6a66-11eb-9131-8e8adbd570d5.png)
+
+인스턴스를 구분할 수 있는 태그를 지정하는 단계입니다.
+
+#### 1-6. 보안 그룹 구성 
+
+![image](https://user-images.githubusercontent.com/48043799/107235193-c5583480-6a67-11eb-92f9-2617bb927bbb.png)
+
+가상방화벽으로 다양한 포트의 트래픽을 제한하거나 활성화시킬 수 있습니다. 웹서버를 설정 후 인터넷 트래픽을 해당 인스턴스 서버에 도달하도록 허용할 경우 웹(HTTP, HTTPS) 통신을 허용하는 규칙을 추가합니다. 또한 DDP 80, SSH 22등 포트 범위를 지정하여 추가할 수 있습니다.
+
+> SSH의 경우 특정 IP로 고정하여 개발 (보안이슈)
+>
+> 다른 장소로 이동시 해당 장소의 IP를 SSH 규칙에 추가하여 작업
+
+
+
+<br>
+
 ## References
 
 - https://www.inflearn.com/course/aws-%EC%9E%85%EB%AC%B8
