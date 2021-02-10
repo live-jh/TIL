@@ -173,8 +173,6 @@ by default all newly created buckets are private. you can setup access control t
 >   - 사용자는 암호화 키만 관리,  S3를 통해 S3 객체 암호화 및 해독 관리
 >   - [참고 링크](https://docs.aws.amazon.com/ko_kr/AmazonS3/latest/dev/ServerSideEncryptionCustomerKeys.html)
 
-
-
 ## S3 Versioning
 
 - All versions of an object(including all writes and even if you delete)
@@ -185,16 +183,57 @@ by default all newly created buckets are private. you can setup access control t
 - uses multi-factor authentication can be used to provide an additional layer of security(MFA)
   - 다중 요소인증을 통해 MFA 추가 보안 계층 제공 가능
 
+## S3 Lifecycle Management
+
+S3에서 생성한 수명주기동안 효율적으로 저장할 수 있도록 객체를 관리하는 기능
+
+- 일정시간동안 변경이 없는 객체에 대한 저장 정책을 정의
+- 사용 빈도가 낮은 데이터를 저렴한 스토리지로 옮기거나 변경하는 정책 지정
+
+### 화면 구성 메뉴
+
+- aws 메인 -> S3
+- 관리탭 -> 수명주기 규칙 (Rule)
+  - 수명주기 규칙 이름
+  - 범위(모든 객체, 필터 범위 제한)
+  - 접두사
+  - 태그
+  - 수명 주기 규칙 작업
+
+![image](https://user-images.githubusercontent.com/48043799/107523417-08e1a880-6bf8-11eb-8bf7-84938a51e226.png)
+
+
+
+![image](https://user-images.githubusercontent.com/48043799/107523668-53fbbb80-6bf8-11eb-9f7f-312e38ba468b.png)
+
+
+
+![image](https://user-images.githubusercontent.com/48043799/107523605-42b2af00-6bf8-11eb-815f-56b0336ec314.png)
+
+> 설정이 끝나면 위와 같은 S3 데이터의 생명주기 타임라인 요약을 확인할 수 있습니다.
+
+### Lifecycle Tips
+
+- 여러 스토리지 게층간에 객체 이동 자동화
+- 버전 관리 기능과 함께 사용 가능
+- 현재 버전 및 이전 버전등 다양하게 사용 가능
+
+
+
 ## S3 Object Lock
 
 > You can use S3 object lock to store objects using a write once, read many model. (여러 모델 또는 한번의 쓰기 사용으로 객체 저장)
-> it can help u prevent objects from being deleted or modified for a fixed amount of time or indefinitely (고정시간 또는 무기한으로 객체 삭제 및 수정 방지 )
+> it can help u prevent objects from being deleted or modified for a fixed amount of time or indefinitely (고정시간 또는 무기한으로 객체 삭제 및 수정 방지)
 >
 >  to add an extra protection against object changes and deletion (객체의 변경 및 삭제에 대한 추가 보호)
+
+내부 데이터를 변경하거나 삭제할 수 없도록 하려면 S3 Object Lock을 사용하면 됩니다.
 
 ## Governance Mode & Compliance Mode
 
 ### Governance Mode
+
+특수 권한이 있는 사용자에게만 제한적 기능
 
 - User can't overwrite or delete an object version or alter its lock
   - 사용자가 특별한 권한이 없는 경우 객체 버전을 덮어쓰거나 삭제 및 잠금 변경 불가
@@ -203,14 +242,19 @@ by default all newly created buckets are private. you can setup access control t
 
 ### Compliance Mode
 
+Governance mode와 반대되는 권한
+
 - Protected object version can't be overwritten or deleted by any user, including the root user
   - 루트 사용자를 포함해 어떤 사용자도 덮어쓰거나 수정 삭제 불가
 - ensures an object version can't be overwritten or deleted for the duration of the retention period
   - 보존 기간동안 객체의 버전 및 수정 삭제가 불가
+  - 보존 기간은 기본적으로 객체 버전 보호기간 (1주, 한달, 1년등)
 
 ## 
 
 ## Glacier Valut Lock
+
+S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
 
 > easily deploy and enforce compliance controls for individual S3 Glacier vaults with a Vault Lock policy. you can **specify controls, such as worm, in a vault lock policy and lock the pllicy from future edits**. once locked, the policy can no longer be changed.
 >
