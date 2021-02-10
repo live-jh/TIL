@@ -262,11 +262,34 @@ S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
 
 
 
+## S3 Perfomance
+
+bucketname/**folder1/sub-folder-1**/file_name1.png 
+
+bucketname/**folder2/sub-folder-2**/file_name1.png
+
+bucketname/**folder2/sub-folder-3**/file_name1.png
+
+굵은 글씨는 접두사 영역, 이는 성능 최적화 측면에서 매우 중요한 부분입니다.
+
+S3는 지연시간이 매우 짧기에 100~200밀리 초 안에 첫번째 바이트를 가져올 수 있으며 버킷에서 접두사마다 초당 3,500개 이상의 PUT/COPY/POST/DELETE 그리고 5,500개의 GET/HEAD 요청을 전송할 수 있습니다. 이는 파일 읽기에 대한 병렬화와 같은 원리로 10개의 접두사를 생성시 읽기(GET) 성능은 초당 55,000으로 확장시킬 수 있는 장점을 가지고 있습니다.
+
 ## S3 limitation when using kms
 
 - Using SSE-KMS to encrypt your objects in s3, you must keep in mind the kms limits
+  - SSE-KMS를 사용하여 S3 객체를 암호화한다면 KMS 제한에 유의해야한다.
+  - 업로드/ 다운로드시 KMS 할당량 반영
+  - 지역별로 다르지만 초당 5,500, 10,000, 30,000 요청
+  - 현재 KMS 할당량 증가를 요청할 수 없음
 - Upload a file, you will call GenerateDatakey in the KMS API
 - Download a file, youy will call Decrypt in the KMS API
+
+### S3 성능 향상 방법
+
+- 멀티파트 업로드 (100메가 이상의 파일)
+- 실제로 5GB 넘는 파일
+- 업로드 병렬화
+- 바이트 범위 가져오기를 사용해 S3에서 파일을 다운로드시 성능 향상
 
 
 
@@ -285,6 +308,8 @@ S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
 
 ## S3 Transfer Acceleration
 
+S3와 데이터를 더욱 빠르게 주고받을 수 있도록 하는 버킷개념의 기능
+
 - You can speed up transfers to S3 using S3 transfer acceleration. This costs extra and has the greatest impact on people who are in a faraway location
 
   - S3 가속을 통해 전송 속도를 상승, 추가비용 및 먼 지역까지 적용 가능
@@ -297,7 +322,52 @@ S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
 
   - S3 버킷에 직접 업로드, 가장 가까운 엣지 위치에 데이터 고유 URL 사용 가능
 
-  
+
+
+
+## S3 Sharing Bucket (Across Accounts)
+
+### S3 버킷에 있는 객체에 대한 교차 계정 엑세스 권한 부여
+
+> [참고링크](https://aws.amazon.com/ko/premiumsupport/knowledge-center/cross-account-access-s3/)
+
+1. 버킷 정책 사용 (전체 버킷에 적용 / Bucket Policies & IAM)
+2. 버킷 엑세스 제어 사용 (ACl & IAM)
+3. ID 엑세스 관리를 사용하여 수행 (교차 계정 IAM)
+
+
+
+### 메뉴
+
+AWS organizations -> 조직생성 -> 계정 추가
+
+![image](https://user-images.githubusercontent.com/48043799/107531628-624dd580-6c00-11eb-8307-87687e25eb8e.png)
+
+**추가 계정 생성 (중복 이메일 불가)**![image](https://user-images.githubusercontent.com/48043799/107532175-f324b100-6c00-11eb-8372-78f78fee1d19.png)
+
+IAM에서 역할 생성 -> 다른 AWS 계정(계정번호 입력 위 이미지의 ID)
+
+![image](https://user-images.githubusercontent.com/48043799/107532613-6cbc9f00-6c01-11eb-9152-e17bcecfd595.png)
+
+FullAccess (전체 접근권한) 요청 -> 태그 입력 -> 검토 (역할이름, 설명등 기입)
+
+
+
+![image](https://user-images.githubusercontent.com/48043799/107533034-dd63bb80-6c01-11eb-994e-f6b04f946b39.png)
+
+
+
+![image](https://user-images.githubusercontent.com/48043799/107533316-2a479200-6c02-11eb-98fe-15003b52fcda.png)
+
+해당 링크를 통해 로그인 가능하며 따로 복사하여 보관합니다.
+
+- 이후 IAM에서 사용자를 추가하고 AWS 관리 콘솔 접근 권한을 부여
+- 비밀번호는 `맞춤`이나 `사용자가 지정`할 수 있는 옵션 선택
+- 그룹 생성 (관리자 엑세스 Administrator Access 선택)
+- 엑세스 정책 -> admins (add user to group)
+- 이후 생성한 계정으로 링크 로그인 후 `역할전환` 진행
+
+지역간 복제, cloudFront, Snowball, storage gateway, ahtena macie
 
 ## Cloud watch
 
