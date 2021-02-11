@@ -218,8 +218,6 @@ S3에서 생성한 수명주기동안 효율적으로 저장할 수 있도록 �
 - 버전 관리 기능과 함께 사용 가능
 - 현재 버전 및 이전 버전등 다양하게 사용 가능
 
-
-
 ## S3 Object Lock
 
 > You can use S3 object lock to store objects using a write once, read many model. (여러 모델 또는 한번의 쓰기 사용으로 객체 저장)
@@ -250,8 +248,6 @@ Governance mode와 반대되는 권한
   - 보존 기간동안 객체의 버전 및 수정 삭제가 불가
   - 보존 기간은 기본적으로 객체 버전 보호기간 (1주, 한달, 1년등)
 
-## 
-
 ## Glacier Valut Lock
 
 S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
@@ -259,8 +255,6 @@ S3 Object Lock과 유사하게 내부에서 객체를 잠그는 방법
 > easily deploy and enforce compliance controls for individual S3 Glacier vaults with a Vault Lock policy. you can **specify controls, such as worm, in a vault lock policy and lock the pllicy from future edits**. once locked, the policy can no longer be changed.
 >
 > 볼트 잠금정책, 개별 S3 Glacier 볼트에 대한 제어를 통해 쉽게 배포하고 적용 가능, 웜과 같은 컨트롤 지정, 이후 편집시 정책을 잠금 가능 (잠길시 정책 변경 불가)
-
-
 
 ## S3 Perfomance
 
@@ -291,8 +285,6 @@ S3는 지연시간이 매우 짧기에 100~200밀리 초 안에 첫번째 바이
 - 업로드 병렬화
 - 바이트 범위 가져오기를 사용해 S3에서 파일을 다운로드시 성능 향상
 
-
-
 ## AWS Organizations
 
 - paying account is for billing purposes only. Don't deploy resources into paying account.
@@ -303,8 +295,6 @@ S3는 지연시간이 매우 짧기에 100~200밀리 초 안에 첫번째 바이
   - 다중 요소 인증 사용
 - enable/disable AWS services using SCP(Service Control Policies) either on OU or on individual accounts.
   - SCP 정책을 사용하여 aws 서비스 활성, 비활성 설정
-
-
 
 ## S3 Transfer Acceleration
 
@@ -321,8 +311,6 @@ S3와 데이터를 더욱 빠르게 주고받을 수 있도록 하는 버킷개�
 - Instead of directly uploading the file to S3 bucket, you will get a distinct URL that will upload the data to the nearest edge location 
 
   - S3 버킷에 직접 업로드, 가장 가까운 엣지 위치에 데이터 고유 URL 사용 가능
-
-
 
 
 ## S3 Sharing Bucket (Across Accounts)
@@ -367,7 +355,42 @@ FullAccess (전체 접근권한) 요청 -> 태그 입력 -> 검토 (역할이름
 - 엑세스 정책 -> admins (add user to group)
 - 이후 생성한 계정으로 링크 로그인 후 `역할전환` 진행
 
+
+
+## S3 Cross Region Replication
+
+- 버전 관리는 소스 및 대상 패키 전체에서 활성
+- 기존 버킷의 파일은 자동으로 복제 불가
+  - 이는 버전 업데이트가 된 이후 파일이 복제
+- 이후 업데이트된 가장 최신 파일이 자동 복제 (이전 모든 버전 복제 x)
+- 개별 버전 삭제 또는 마커 삭제는 복제 불가
+- 높은 수준의 교차 지역 복제 이해 필요
+
+> 버킷 복제를 받을 S3 버킷을 생성 후 
+>
+> 복제될 S3 버킷에 상세페이지에 접근하여 복제 규칙을 생성합니다.
+>
+> 또한 복제가 될 S3 버킷 대상에 대한 버전 관리를 활성화시켜야 복제가 가능합니다.
+
+### 복제 시나리오
+
+1. 복제 받을 새로운 버킷을 생성
+2. 복제할 버킷에 복제 규칙을 설정(규칙명, IAM 역할, 소스 버킷 설정, 해당 계정의 버킷선택, 다른 aws 계정의 버킷 선택(대상 버킷 설정))
+3. 복제할 버킷에 파일을 업로드 후 업로드하며 버전 업데이트를 실행
+4. 객체 버전 리스트를 통해 해당 버킷의 파일 버전이 변경되었는지 확인
+5. 객체가 만일  비공개일시 공개로 변경
+6. 복제받을 대상의 버킷에 접속하여 복제된 파일을 확인 (최신 파일이 복제)
+7. 이는 **지역간 복제**
+
+
+
+
+
 지역간 복제, cloudFront, Snowball, storage gateway, ahtena macie
+
+
+
+<br>
 
 ## Cloud watch
 
