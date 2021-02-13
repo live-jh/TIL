@@ -420,9 +420,31 @@ FullAccess (전체 접근권한) 요청 -> 태그 입력 -> 검토 (역할이름
 
 ![image](https://user-images.githubusercontent.com/48043799/107780998-bbe20b80-6d8a-11eb-8a91-73758880af29.png)
 
+## Snowball
+
+ 대량의 데이터를 AWS로 주고받는 페타바이트급 대용량 데이터를 전송하기 위한 서비스입니다. 높은 네트워크 비용, 긴 transger 시간 및 보안 문제를 포함한 대규모 데이터 전송으로 일반적인 문제를 해결할 수 있습니다. Snowball을 통해 데이터를 전송하는 것은 간단하고, 빠르고, 안전하며, 고속 인터넷 비용의 5분의 1로 절감할 수 있습니다.
+
+- 페타바이트급 대용량 데이터를 전송하기 위한 서비스
+- 서비스와 더불어 물리적 실체가 존재하여 AWS에 요청시 Snowball을 받아 온프레미스 데이터를 빠르게 Snowball로 이동시킨 뒤 작업이 완료되면 해당 물리 장비를 AWS에 재전송하고 S3 버킷에 저장
+- 스토리지는 50TB에서 최대 용량 80TB 저장 가능
+
+### Snowball 사용 예
+
+- 페타바이트 규모의 데이터를 AWS로 이송하는 경우
+- 물리적으로 격리된 환경이나 인테넛 환경이 좋지 않을 경우 
+- AWS로 데이터 업로드시 1주일 이상 소용될 경우
+
+## Snowball Edge
+
+100TB 데이터 제공
+
+람다 함수처럼 실행
 
 
-~~지역간 복제~~, ~~CloudFront~~, Snowball, storage gateway, ahtena macie
+
+
+
+~~지역간 복제~~, ~~CloudFront~~, ~~Snowball~~, storage gateway, ahtena macie
 
 <br>
 
