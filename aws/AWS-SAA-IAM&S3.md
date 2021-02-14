@@ -426,7 +426,9 @@ FullAccess (전체 접근권한) 요청 -> 태그 입력 -> 검토 (역할이름
 
 - 페타바이트급 대용량 데이터를 전송하기 위한 서비스
 - 서비스와 더불어 물리적 실체가 존재하여 AWS에 요청시 Snowball을 받아 온프레미스 데이터를 빠르게 Snowball로 이동시킨 뒤 작업이 완료되면 해당 물리 장비를 AWS에 재전송하고 S3 버킷에 저장
-- 스토리지는 50TB에서 최대 용량 80TB 저장 가능
+- 256비트 암호화
+- 80TB 및 50TB 모델은 미국 리전에서 사용할 수 있으며, 50TB 모델은 기타 모든 AWS 리전에서 사용할 수 있습니다.
+- 하드웨어 디바이스를 구입하거나 유지 관리할 필요가 없음
 
 ### Snowball 사용 예
 
@@ -436,11 +438,24 @@ FullAccess (전체 접근권한) 요청 -> 태그 입력 -> 검토 (역할이름
 
 ## Snowball Edge
 
-100TB 데이터 제공
+Snowball 디바이스 유형으로 일부 AWS 기능을 위해 온보드 스토리지와 컴퓨팅 파워를 제공합니다. AWS 클라우드간 데이터 전송외에 로컬 처리 및 엣지 컴퓨팅 워크로드를 수행할 수 있습니다. 인터넷보다 더 빠른 속도로 데이터를 전송할 수 있으며 Edge 디바이스에는 3가지 구성 옵션이 존재합니다.(스토리지 최적화, 컴퓨텅 최적화, GPU 최적화)
 
-람다 함수처럼 실행
+- 전송속도가 최대 100GB/초 
+- 100TB 데이터 제공
+- 암호화 적용되어 물리적으로 전송중인 데이터 보호
+- 로컬환경과 S3간 데이터를 가져오거나 보낼때 인터넷을 사용하지 않고 하나 이상의 디바이스로 데이터를 물리적 전송 가능
+- Snowball Edge 디바이스는 네트워크 연결을 관리하고 서비스 상태 정보를 가져올때 사용할 수 있는 온보드 LCD 디스플레이 함께 제공
+- 람다 함수를 지원
 
+![image](https://user-images.githubusercontent.com/48043799/107879948-32b00d80-6f1f-11eb-83d4-8c0379b0f31f.png)
 
+> Snowball 과 Snowball Edge의 사용 사례 차이
+
+![image-20210214234931226](/Users/lj/Library/Application Support/typora-user-images/image-20210214234931226.png)
+
+> Snowball 과 Snowball Edge의 하드웨어 차이
+
+![image-20210214235039116](/Users/lj/Library/Application Support/typora-user-images/image-20210214235039116.png)
 
 
 
