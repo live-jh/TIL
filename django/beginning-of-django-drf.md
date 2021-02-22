@@ -270,6 +270,8 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 
 
+
+
 ## Reference
 
 - https://educast.com/course/web/ZU53/
