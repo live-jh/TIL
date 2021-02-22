@@ -159,8 +159,6 @@ DRF의 모든 View는 APIView를 상속받습니다. APIView를 통해 Response�
 
 포스트 조회 응답시에 사용자의 이름이 필요할 때 다음과 같이 적용할 수 있습니다. PostSerializer를 응답할떄` AuthorSerializer`를 인스턴스로 사용하여 `author`를 변수로 선언하고 이를 PostSerializer 응답시 Author 자체의 username을 포함해 필요한 모든 필드를 선언 후 사용할 수 있습니다.
 
-
-
 ### Example
 
 ```python
@@ -194,13 +192,17 @@ class PostSerializer(ModelSerializer):
 
 ![스크린샷 2021-01-15 오전 12 32 23](https://user-images.githubusercontent.com/48043799/104612084-27bc5000-56c9-11eb-9b38-c161738fcecb.png)
 
+
+
 ## Serializer View 처리
 
 Form의 생성자 첫번째 인자는 data 자체이지만, Serializer 생성자의 첫번째 인자는 객체의 instance입니다.
 
-> PostSerializer(instance=Post.objects.all(), many=True).data -> instance
+`PostSerializer(instance=Post.objects.all(), many=True).data -> instance`
 
-**APIView 클래스** or **@api_view decorators**를 활용하여 View의 속성을 부여하여 사용합니다.
+또한 SerializerView는 **APIView 클래스** or **@api_view decorators**를 활용하여 View의 속성을 부여하여 사용합니다.
+
+
 
 ### serializers.py
 
