@@ -153,6 +153,12 @@ DRF Response는 요청 콘텐츠 타입에 맞춰 응답을 주는 역할을 합
 
 DRF의 모든 View는 APIView를 상속받습니다. APIView를 통해 Response에 다양한 속성을 지정할 수 있습니다.
 
+
+
+## Serializer의 중첩 사용 
+
+포스트 조회 응답시에 사용자의 이름이 필요할 때 다음과 같이 적용할 수 있습니다. PostSerializer를 응답할떄` AuthorSerializer`를 인스턴스로 사용하여 `author`를 변수로 선언하고 이를 PostSerializer 응답시 Author 자체의 username을 포함해 필요한 모든 필드를 선언 후 사용할 수 있습니다.
+
 ### Example
 
 ```python
@@ -176,7 +182,7 @@ class PostSerializer(ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'author',
+            'author', # author = AuthorSerializer() 의미
             'message',
             'created_at',
             'updated_at',
@@ -186,15 +192,13 @@ class PostSerializer(ModelSerializer):
 
 ![스크린샷 2021-01-15 오전 12 32 23](https://user-images.githubusercontent.com/48043799/104612084-27bc5000-56c9-11eb-9b38-c161738fcecb.png)
 
-## 
-
 ## Serializer View 처리
 
 Form의 생성자 첫번째 인자는 data 자체이지만, Serializer 생성자의 첫번째 인자는 객체의 instance입니다.
 
 > PostSerializer(instance=Post.objects.all(), many=True).data -> instance
 
-APIView 클래스 or @api_view decorators를 활용하여 View의 속성을 부여하여 사용합니다.
+**APIView 클래스** or **@api_view decorators**를 활용하여 View의 속성을 부여하여 사용합니다.
 
 ### serializers.py
 
@@ -222,7 +226,7 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 ### authentication: 인증 클래스
 
 - sessionAuthentication: 세션기반 인증
-- BasicAuthentication: http basic 인증
+- BasicAuthentication: HTTP basic 인증
 
 ### throttle : 요청 제한 클래스
 
@@ -241,6 +245,28 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 - SimpleMetadata
 
 ### versioning: 요청에 api 버전 정보 탐색 클래스
+
+- None: API 버전 정보를 탐지하지 않는 선언
+- 요청 URL에 GET 인자에 HEADER 버전 정보를 확인하여 해당 버전에 맞는 APIView를 호출되도록 실행
+
+
+
+## APIView(Class Base View)
+
+하나의 CBV로써 하나의 URL만 처리가 가능하고 method(get, post, put, delete)에 맞게 멤버함수를 구현 후 해당 요청이 들어올때마다 함수 호출
+
+- 직렬화/비직렬화 (JSON)
+- 인증 체크
+- 사용량 제한 체크(호출 범위 지정)
+- 권한 클래스 지정 (유저 로그인, 비로그인, 인증, 비인증등 허용 여부 결정)
+- 요청된 API 버전 문자열 탐지 후 request.version에 저장
+- [참고 URL](https://github.com/encode/django-rest-framework/blob/master/rest_framework/views.py) -> dispatch -> initial
+
+<img width="588" alt="스크린샷 2021-02-22 오후 12 56 09" src="https://user-images.githubusercontent.com/48043799/108656904-71405c00-750d-11eb-9890-fcde797d985a.png">
+
+> API version 버전관리가 사용중인 경우 확인,  들어오는 요청 허용 여부등 체크
+
+
 
 
 
