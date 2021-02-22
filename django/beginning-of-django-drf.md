@@ -159,6 +159,8 @@ DRF의 모든 View는 APIView를 상속받습니다. APIView를 통해 Response�
 
 포스트 조회 응답시에 사용자의 이름이 필요할 때 다음과 같이 적용할 수 있습니다. PostSerializer를 응답할떄` AuthorSerializer`를 인스턴스로 사용하여 `author`를 변수로 선언하고 이를 PostSerializer 응답시 Author 자체의 username을 포함해 필요한 모든 필드를 선언 후 사용할 수 있습니다.
 
+
+
 ### Example
 
 ```python
