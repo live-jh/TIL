@@ -272,6 +272,69 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 
 
+## CBV APIView Example Code
+
+```python
+# APIView(View): 클래스 내에 return시 crsf_exempt(view)
+# Note: session based authentication is explicitly CSRF validated,
+# all other authentication is CSRF exempt.
+
+class PostListAPIView(APIView):
+    def get(self, request):
+        qs = Post.objects.all()
+        serializer = PostSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+      
+```
+
+## FBV APIView Example Code
+
+```python
+# 하나의 작업만을 구현할때 @api_view 장식자 이용한 로직 유용
+@api_view(['GET', 'POST'])
+def post_list(request):
+    if request.method == 'GET':
+        serializer = PostSerializer(Post.objects.all(), many=True)
+        return Response(serializer.data)
+    else:
+        serializer = PostSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+```
+
+
+
+## Django DRF Support mixins
+
+필요에 따라 다양한 믹스인을 생성 가능
+
+- CreateModelMixin
+- ListModelMixin
+- RetrieveModelMixin
+- UpdateModelMixin
+- DestroyModelMixin
+
+## 다양한 generics APIView
+
+- generics.CreateAPIView : post -> create
+- generics.ListAPIView : get -> list
+- generics.RetrieveAPIView : get -> retrieve
+- generics.DestroyAPIView : delete -> destroy
+- generics.UpdateAPIView : put -> update, patch -> partial_update
+- generics.ListCreateAPIView : get -> list, post -> create
+- generics.RetrieveUpdateAPIView : get -> retrieve, put -> update, patch -> partial_update
+- generics.RetrieveDestroyAPIView : get -> retrieve, delete -> destroy
+- generics.RetrieveUpdateDestroyAPIView : get -> retrieve, put -> update, delete -> destroy, patch -> partial_update
+
 
 
 ## Reference
