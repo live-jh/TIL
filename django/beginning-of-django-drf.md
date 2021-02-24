@@ -335,6 +335,55 @@ def post_list(request):
 - generics.RetrieveDestroyAPIView : get -> retrieve, delete -> destroy
 - generics.RetrieveUpdateDestroyAPIView : get -> retrieve, put -> update, delete -> destroy, patch -> partial_update
 
+> [django generics github code](https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py)
+
+## View 구현 Tip
+
+### 중복 줄이기 및 상황에 따른 View 구현
+
+- ViewSet
+- APIView(CBV), @api_view(FBV)
+- View(Django)
+
+
+
+## ViewSet
+
+단일 리소스에서 관련있는 View들을 단일 클래스에서 제공하는 것을 말합니다.
+
+list/create/detail/update/delete/partial_update 등을 멤버 함수로 구현할 수 있습니다.
+
+```python
+Class PostListAPIVIew(generics.ListCreateAPIView):
+		queryset = Post.objects.all()
+		serializer_class = PostSerializer
+		
+Class PostDetailAPIVIew(generics.RetrieveUpdateDestroyAPIView): # Retrieve -> get(detail)
+		queryset = Post.objects.all()
+		serializer_class = PostSerializer
+    
+# ViewSet을 사용해 하나로 합쳐 사용 가능
+```
+
+### ModelViewSet
+
+- viewsets.ReadOnlyModelViewSet
+  - list -> 1개 url
+  - detail -> 1개 url
+- viewsets.ModelViewSet
+  - list/create -> 1개 url
+  - detail/update/partial_update/delete -> 1개 url
+
+### URL_PATTERN 매핑
+
+- 개별 View.as_view 연결
+- Router를 통해 일괄 등록
+  - `router = DefaultRouter()`
+  - `router.register('post', views.PostViewSet)`
+  - `path('', include(router.urls))`
+
+
+
 
 
 ## Reference
