@@ -104,6 +104,38 @@
 
 
 
+## Security Group
+
+EC2에 웹서버 설정을 한 이후 웹페이지를 우리가 접근할 수 있는 이유는 보안 그룹의 웹 포트 80를 지정했기 때문입니다. 해당 EC2 Instances 페이지내에 보안 그룹에 인바운드 규칙을 확인할 수 있습니다. 
+
+### Network & Security -> Security Groups -> Inbound
+
+![image](https://user-images.githubusercontent.com/48043799/109383808-51090680-792c-11eb-828f-341e4bd8f1f5.png)
+
+![image](https://user-images.githubusercontent.com/48043799/109383842-96c5cf00-792c-11eb-836a-9ee9e181d98c.png)
+
+> Q. 보안그룹의 규칙이 위와 아래의 차이는 어떤 모습일까?
+>
+> A. 실제로 접근 가능한 port 범위에 적용되지 않아 해당 퍼블릭 IP로 접근하여도 사이트에 연결할 수 없음 페이지가 노출이 됩니다.
+
+### Network & Security -> Security Groups -> Outbound
+
+기본적으로 아웃바운드는 인바운드 규칙을 생성시 자동적으로 규칙이 생성되어지게 됩니다. 이러한 형태로 아웃바운드의 규칙을 모두 제거하더라도 인바운드의 규칙에 VPN을 허용하게 될 시 아웃바운드도 자동적으로 혀옹되어지게 됩니다. 따라서 인바운드 규칙을 만들때는 반드시 아웃바운드의 규칙 또한 지정하도록 해야합니다. 또한 보안그룹은 개별 IP를 차단할 수 없으며 인스턴스 하나당 보안그룹은 둘 이상으로 연결이 가능합니다.
+
+### Security Groups Tips
+
+- All Inbound traffic is blocked by default (기본적으로 모두 차단 기능)
+  - 보안 그룹을 이용해 활성화 처리 (80 or 22)
+- All Outboud traffic is allowed (아웃바운드는 모든 트래픽 기본적 허용)
+- Can have any number of EC2 instances within a security group(단일 보안 그룹내 여러 인스턴스)
+- Can have multiple security groups attached to EC2 instances (하나의 인스턴스에 여러 보안 그룹 연결)
+- Security Groups are Stateful (상태 저장)
+- If Create an inbound rule allowing traffic in, that traffic is automatically allowed back out again (트래픽 허용 인바운드 규칙을 생성시 -> 자동으로 허용)
+- Can't block specific IP addresses using Security Groups, instead use network access control lists (특정 IP 차단 불가 -> 네트워크 액세스 제어 목록을 사용해서 가능)
+- can specify allow rules, but not deny rules (허용 규칙 지정 가능, 거부 규칙 지정 불가)
+
+
+
 ## Quiz
 
 Q1. If an Amazon EBS volume is the root device of an instance, can I detach it without stopping the instance?
