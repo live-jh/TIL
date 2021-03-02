@@ -110,16 +110,46 @@ post_set = [
 ]
 
 json_string = json.dumps(post_set) #'{"title": "hello"}' #직렬화
+json.dump("한글", ensure_ascii=False).encode('utf8') #utf-8 인코딩 -> 직접 변환
 
 json.loads(json_string) #역직렬화
 
+
 ```
+
+
+
+### 직접 변환 Rule 지정
+
+```python
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.query import QuerySet
+
+class MyJSONENcoder(DjangoJSONEncoder):
+		def default(self, obj):
+				if isinstance(obj, QuerySet): #obj가 QuerySet 타입일때
+						return turple(obj)
+				elif isinstance(obj, Post): #obj가 Post 일때
+						return {'id': obj.id, "title": obj.title}
+				elif hasattr(obj, 'as_dict'): #obj에 as_dict 포함할때
+						return obj.as_dict()
+				return super().default(obj)
+				
+data = Post.objects.all()
+json.dump(data, cls=MyJSONEncoder, ensure_ascii=False) -> 직접 변환 Rule 지정
+```
+
+
 
 
 
 ### Object of type User is not JSON serializable
 
 장고 타입(Model, QuerySet)에 대한 직렬화 rule을 기본적으로 지원하지 않아서 발생하는 error입니다. 장고의 DjangoJSONEncoder, json.JSONEncoder, JSONRenderer등을 사용하여 직렬화 작업을 수행할 수 있습니다. 마지막으로 QuerySet은 JsonResponse(MyJSONEncoder)를 통해, Model타입은 따로 ModelSerializer를 통해 변환합니다.
+
+
+
+
 
 
 
