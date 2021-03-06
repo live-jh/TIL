@@ -86,6 +86,7 @@ http 설치: `pip install httpie`
 
 - `$ http GET(생략시 자동 GET) 요청주소 GET인자==값 GET인자==값`
 - `$ http --json POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
+- `$ http POST 요청주소 POST인자=값`
   - `application/json -> 요청 데이터 JSON 직렬화`
 - `$ http --form POST 요청주소 GET인자==값 GET인자==값 POST인자=값`
   - `multipart/form-data`
@@ -115,9 +116,20 @@ json.dump("한글", ensure_ascii=False).encode('utf8') #utf-8 인코딩 -> 직�
 json.loads(json_string) #역직렬화
 
 
+#TypeError: Object of type "obj_name" is not JSON serializable (Model or QuerySet에 대해 직렬화 Rule X)
+from django.contrib.auth import get_user_model
+User = get_user_model()
+json.dumps(User.objects.first()) # error
+
 ```
 
+### Object of type User is not JSON serializable (Type Error)
 
+장고 타입(Model, QuerySet)에 대한 직렬화 rule을 기본적으로 지원하지 않아서 발생하는 error입니다. 장고의 DjangoJSONEncoder, json.JSONEncoder, JSONRenderer등을 사용하여 직렬화 작업을 수행할 수 있습니다. 마지막으로 QuerySet은 JsonResponse(MyJSONEncoder)를 통해, Model타입은 따로 ModelSerializer를 통해 변환합니다.
+
+
+
+## Djanngo 기본에서 view단의 직렬화
 
 ### 직접 변환 Rule 지정
 
@@ -141,47 +153,81 @@ json.dump(data, cls=MyJSONEncoder, ensure_ascii=False) -> 직접 변환 Rule 지
 
 
 
+## JSONRender
+
+### rest_framework/utils/encoders.py의 JSONEncoder를 이용한 직렬화
+
+- json.JSONEncoder 상속을 통해 구현
+- datetime.datetime/date/time/timedelta, decimal.Decimal, uuid.UUID, six_binary_type
+- '____getItem____' 속성을 지원할 경우 dict(obj) 반환
+- '____iter____' 속성을 지원할 경우 tuple 반환
+- QuerySet 타입일 경우 tuple 반환
+- Model 타입은 미지원 -> ModelSerializer를 사용해 변환
 
 
-### Object of type User is not JSON serializable
 
-장고 타입(Model, QuerySet)에 대한 직렬화 rule을 기본적으로 지원하지 않아서 발생하는 error입니다. 장고의 DjangoJSONEncoder, json.JSONEncoder, JSONRenderer등을 사용하여 직렬화 작업을 수행할 수 있습니다. 마지막으로 QuerySet은 JsonResponse(MyJSONEncoder)를 통해, Model타입은 따로 ModelSerializer를 통해 변환합니다.
-
-
-
-
-
-
-
-## ModelSerializer
-
-역할면에서 post 요청만 처리하는 Form으로부터 데이터가 포함된 JSON 문자열을 생성하며 입력된 데이터에 대한 유효성 검사등을 처리할 수 있습니다.
-
-Model 객체는 many=False(default setting) 지정하지만 QuerySet 객체의 경우 필수로 many=True 옵션을 주어야합니다.
-
-![image](https://user-images.githubusercontent.com/48043799/104604680-f3449600-56c0-11eb-99ec-e59761b6e4a5.png)
+## JsonResponse에서 QuerySet JSON 직렬화
 
 ```python
-serializer = PostSerializer(Post.objects.all(), many=True) #다수일경우 Many = True
-get_serializer = PostSerializer(Post.objects.first()) #Model 객체 = default => False 
+qs = Post.objects.all()
+encoder = MyJSONEncoder
+safe = False
+json_dumps_params = {'ensure_ascii': False} # True: data가 dict인 경우, False: dict이 아닌 경우
+kwargs = {}
 
-serializer.data
+from Django.http import JsonResponse
+
+response = JsonResponse(qs, encoder, safe, json_dumps_params, **kwargs)
 
 ```
 
 
 
-## DRF HttpResponse JSON 응답
+## Django_RestFramework에서 직렬화
+
+### DRF HttpResponse JSON 응답
 
 Response상에선 JSON직렬화가 Lazy하게 동작하며 실 응답을 생성할 때 rendered_content 속성에 접근하며, 접근한 순간 변환 처리가 됩니다.
 
-DRF Response는 요청 콘텐츠 타입에 맞춰 응답을 주는 역할을 합니다. (drf 사용시 늘 Response 사용)
+DRF Response는 요청 콘텐츠 타입에 맞춰 응답을 주는 역할을 합니다. **(drf 사용시 늘 Response 사용)**
 
 
 
-## Response APIView
+### Response APIView
 
 DRF의 모든 View는 APIView를 상속받습니다. APIView를 통해 Response에 다양한 속성을 지정할 수 있습니다.
+
+### rest_framework Code Example
+
+```python
+from rest_framwork import generics
+
+class PostListAPIView(generics.ListAPIView):
+		queryset = Post.objects.all()
+		serializer_class = PostModelSerializer
+		
+post_list = PostListAPIView.as_view()
+```
+
+
+
+
+
+### ModelSerializer
+
+역할면에서 post 요청만 처리하는 Form으로부터 데이터가 포함된 JSON 문자열을 생성하며 입력된 데이터에 대한 유효성 검사등을 처리할 수 있습니다.
+
+Model 객체는 many=False(default setting) 지정하지만 **QuerySet 객체의 경우 필수로 many=True** 옵션을 주어야합니다.
+
+실제 비지니스(서비스)쪽을 담당하는 역할이기도 합니다. (데이터 생성, 수정, 조회등)
+
+![image](https://user-images.githubusercontent.com/48043799/104604680-f3449600-56c0-11eb-99ec-e59761b6e4a5.png)
+
+```python
+serializer = PostSerializer(Post.objects.all(), many=True) #다수일경우 Many = True
+get_serializer = PostSerializer(Post.objects.first()) #Model 객체 many = default => False 
+
+```
 
 
 
@@ -226,7 +272,7 @@ class PostSerializer(ModelSerializer):
 
 ## Serializer View 처리
 
-Form의 생성자 첫번째 인자는 data 자체이지만, Serializer 생성자의 첫번째 인자는 객체의 instance입니다.
+**Form의 생성자 첫번째 인자**는 **data 자체**이지만, **Serializer 생성자의 첫번째 인자**는 객체의 **instance**입니다.
 
 `PostSerializer(instance=Post.objects.all(), many=True).data -> instance`
 
@@ -240,7 +286,7 @@ BaseSerializer -> init 함수 확인 (self, instance=None, data=empty, **kwargs)
 
 ### generics.py
 
-GenericAPIView(views.APIView) 상속 (query_set, serializer_classe) 등
+GenericAPIView(views.APIView) 상속 (query_set, serializer_classe) 등을 주로 사용
 
 ### decorators.py
 
@@ -253,11 +299,11 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 ### parser: 비직렬화 클래스
 
-- JSONparser 포맷 처리
+- JSONparser 포맷 처리 (request.body -> parsing)
 - Formparser
 - Multipartparser
 
-### authentication: 인증 클래스
+### authentication: 인증 클래스 (유저 식별)
 
 - sessionAuthentication: 세션기반 인증
 - BasicAuthentication: HTTP basic 인증
@@ -266,7 +312,7 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 - 빈 듀플(default setting x)
 
-### permission: 권한 클래스
+### permission: 권한 클래스 (유저를 식별하고 난 이후에 접근 레벨 정의)
 
 - PermissionsAllowAny: 모두 접근 가능
 
@@ -285,7 +331,9 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 
 
-## APIView(Class Base View)
+## 
+
+## DRF의 기본 뷰 - APIView(Class Base View)
 
 하나의 CBV로써 하나의 URL만 처리가 가능하고 method(get, post, put, delete)에 맞게 멤버함수를 구현 후 해당 요청이 들어올때마다 함수 호출
 
@@ -324,7 +372,29 @@ class PostListAPIView(APIView):
       
 ```
 
-## FBV APIView Example Code
+
+
+## 다양한 generics APIView
+
+개별 (list, post & detail ,put, delete) 로 5개로 구현되는걸 패턴화 시켜놓은 것을 **django rest framework의 generics**
+
+- generics.CreateAPIView : post -> create
+- generics.ListAPIView : get -> list
+- generics.RetrieveAPIView : get -> retrieve
+- generics.DestroyAPIView : delete -> destroy
+- generics.UpdateAPIView : put -> update, patch -> partial_update
+- generics.ListCreateAPIView : get -> list, post -> create
+- generics.RetrieveUpdateAPIView : get -> retrieve, put -> update, patch -> partial_update
+- generics.RetrieveDestroyAPIView : get -> retrieve, delete -> destroy
+- generics.RetrieveUpdateDestroyAPIView : get -> retrieve, put -> update, delete -> destroy, patch -> partial_update
+
+> [django generics github code](https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py)
+
+## 
+
+## DRF의 기본 뷰 - @api_view
+
+### FBV APIView Example Code
 
 ```python
 # 하나의 작업만을 구현할때 @api_view 장식자 이용한 로직 유용
@@ -345,6 +415,10 @@ def post_list(request):
 
 ## Django DRF Support mixins
 
+클래스기반 View의 확장성을 극대화시켜주는 기능 (다중 상속)
+
+APIView =>  mixins(로직들의 재사용성을 증가) => Generics(패턴화하여 더 구조화) >= ViewSet(더욱 정리한 구조, 추상화)
+
 필요에 따라 다양한 믹스인을 생성 가능
 
 - CreateModelMixin
@@ -353,19 +427,7 @@ def post_list(request):
 - UpdateModelMixin
 - DestroyModelMixin
 
-## 다양한 generics APIView
 
-- generics.CreateAPIView : post -> create
-- generics.ListAPIView : get -> list
-- generics.RetrieveAPIView : get -> retrieve
-- generics.DestroyAPIView : delete -> destroy
-- generics.UpdateAPIView : put -> update, patch -> partial_update
-- generics.ListCreateAPIView : get -> list, post -> create
-- generics.RetrieveUpdateAPIView : get -> retrieve, put -> update, patch -> partial_update
-- generics.RetrieveDestroyAPIView : get -> retrieve, delete -> destroy
-- generics.RetrieveUpdateDestroyAPIView : get -> retrieve, put -> update, delete -> destroy, patch -> partial_update
-
-> [django generics github code](https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py)
 
 ## View 구현 Tip
 
@@ -373,38 +435,68 @@ def post_list(request):
 
 - ViewSet
 - APIView(CBV), @api_view(FBV)
-- View(Django)
+- View(Django) 
 
 
 
-## ViewSet
+## ViewSet 
 
-단일 리소스에서 관련있는 View들을 단일 클래스에서 제공하는 것을 말합니다.
+단일 리소스에서 **관련있는 View들을 단일 클래스에서 제공**하는 것을 말합니다. (http 요청을 다수로 엮어 처리하는 의미 -> generics를 조금 더 구조화 시켜 놓은 개념)
 
 list/create/detail/update/delete/partial_update 등을 멤버 함수로 구현할 수 있습니다.
 
 ```python
-Class PostListAPIVIew(generics.ListCreateAPIView):
+from rest_framework import generics
+
+class PostListAPIVIew(generics.ListCreateAPIView):
 		queryset = Post.objects.all()
 		serializer_class = PostSerializer
 		
-Class PostDetailAPIVIew(generics.RetrieveUpdateDestroyAPIView): # Retrieve -> get(detail)
+class PostDetailAPIVIew(generics.RetrieveUpdateDestroyAPIView): # Retrieve -> get(detail)
 		queryset = Post.objects.all()
 		serializer_class = PostSerializer
     
-# ViewSet을 사용해 하나로 합쳐 사용 가능
+# 위 2개의 View를 ViewSet을 사용해 하나로 합쳐 사용 가능
+class PostViewSet(ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def list(self, request, *args, **kwargs):
+        pass
+
+    def create(self, request, *args, **kwargs):
+        pass
+
+    def update(self, request, *args, **kwargs):
+        pass
+
+    def retrieve(self, request, *args, **kwargs):
+        pass
+
+    def partial_update(self, request, *args, **kwargs):
+        pass
+
+    def dispatch(self, request, *args, **kwargs):
+        print(request.body)  # logger
+        print(request.POST)  # logger
+        return super().dispatch(request, *args, **kwargs)
+
 ```
 
 ### ModelViewSet
 
+2가지의 ViewSet이 존재 **ReadOnlyModelViewSet & ModelViewSet**
+
 - viewsets.ReadOnlyModelViewSet
+  - GET 요청에만 응답하는 ViewSet
   - list -> 1개 url
   - detail -> 1개 url
 - viewsets.ModelViewSet
+  - GET, POST 둘 다 응답하는 ViewSet
   - list/create -> 1개 url
   - detail/update/partial_update/delete -> 1개 url
 
-### URL_PATTERN 매핑
+### URL_PATTERN Router 매핑
 
 - 개별 View.as_view 연결
 - Router를 통해 일괄 등록
@@ -414,7 +506,7 @@ Class PostDetailAPIVIew(generics.RetrieveUpdateDestroyAPIView): # Retrieve -> ge
 
 
 
-
+## 
 
 ## Reference
 
