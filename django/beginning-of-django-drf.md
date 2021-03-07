@@ -487,12 +487,12 @@ class PostViewSet(ModelViewSet):
 
 2가지의 ViewSet이 존재 **ReadOnlyModelViewSet & ModelViewSet**
 
-- viewsets.ReadOnlyModelViewSet
-  - GET 요청에만 응답하는 ViewSet
+- **viewsets.ReadOnlyModelViewSet**
+  - **GET** 요청에만 응답하는 ViewSet
   - list -> 1개 url
   - detail -> 1개 url
-- viewsets.ModelViewSet
-  - GET, POST 둘 다 응답하는 ViewSet
+- **viewsets.ModelViewSet**
+  - **GET, POST** 둘 다 응답하는 ViewSet
   - list/create -> 1개 url
   - detail/update/partial_update/delete -> 1개 url
 
@@ -570,7 +570,7 @@ queryset, serializer_class, renderer_class
 
 ### @api_vew마다 지정
 
-- URL Captured Vaue는 keyword args를 통해 전달됩니다. format 인자를 받는 설정했다면 format 인자 추가 작업 `(formant=)`
+URL Captured Value는 keyword args를 통해 전달됩니다. format 인자를 받는 설정했다면 format 인자 추가 작업 `(formant=)`
 
 
 
@@ -587,14 +587,14 @@ queryset, serializer_class, renderer_class
 
 ### Form & ModelForm
 
-- HTML 입력 폼을 이용한 유효성 검사
+- **HTML 입력 폼**을 이용한 유효성 검사
   - HTML Form Submit을 통해 비동기 호출 (Android/iOS에 의한 http 요청도 포함)
 - Create or Update 에 대한 처리 활용 -> django admin 
 - CreateView/UpdateView CBV를 활용한 View 처리 (단일 수행 View)
 
 ### Serializer&ModelSerializer
 
-- 데이터 변환 및 직렬화 (JSON 포맷)
+- **데이터 변환 및 직렬화 (JSON 포맷)**
   - 다양한 Client에 대한 Data 위주 http 요청 (Web, iOS, RNApp, Android)
 - Web API 포맷에 대한 유효성 검사
 - List/Create 또는 특정 데이터에 대한 Retrieve/Edit/Delete 등에 활용
@@ -622,13 +622,101 @@ class BaseSerializer(Field):
 
 ### serializer.save(**kwargs) 호출 할 때
 
-- DB에 저장한 관련 instance를 리턴
+- DB에 저장한 관련 **instance**를 리턴
 - .validated_data와 kwargs dict을 합친 데이터 다음 요청과 같이 수행한다.
   - .update & .create 함수를 통해 필드에 값을 할당 후 DB insert
     - .update() : self.instance 인자를 지정시
     - .create() : self.instance 인자를 지정하지 않았을 시
 
 
+
+## DRF에서 유일성 체크를 위한 Validators 제공
+
+- UniqueValidator: 지정 1개 필드가 QuerySet 범위에서 유일성 여부 체크
+  - 모델 필드에 **unique=True 지정시 자동 지정**
+    - QuerySet 필수
+    - Message: 유효성 검사 실패시 에러 메세지
+    - lookup: default exact (매칭)
+    - `validators=[UniqueValidator(queryset=Post.objects.all())]`
+      - 가급적 모델 필드에 Unique=True 설정으로 사용 
+- UniqueTogetherValidator: UniqueValidator의 다수 필드
+- UniqueForDateValidator: 유일성 여부 체크
+  - `validators=[UniqueForDateValidator(queryset=Post.objects.all(), field='slug', date_field='published')]`
+  - queryset 필수 (1차 범위)
+  - field 필수 (조건 부여)
+  - date_field 필수 (2차 범위)
+- UniqueForMonthValidator: 지정 월 범위 유일성 체크
+- UniqueForYearValidator: 지정 년 범위 유일성 체크
+
+
+
+## 유효성 검사 실패시 ValidationError 예외 발생
+
+### **rest_framework.exceptions.ValidationError 사용** 
+
+- serializer의 유효성 검사 방법 -> 필드 정의시 **validators 지정** 또는 **클래스 Meta.validators 지정**
+- APIException예외 클래스의 상속을 받아 처리
+- django.forms.exceptions.ValidationError X
+- form에서는 `clean` 멤버함수로 serializer에서는 `validate_` 멤버함수로 구현
+
+
+
+### Mixins perform_ 계열 함수
+
+Create시 추가로 DB 반영(저장, 수정, 삭제)
+
+- perform_create(serializer)
+- perform_update(serializer)
+- perform_destroy(instance)
+
+
+
+## 인증
+
+유입되는 요청에 대해 **허용/거부** 하는 것이 아니라 **단순 인증 정보로 유저를 식별**하는 것
+
+- Authentication: 유저 식별
+- Permissions: 각 요청에 대한 허용/거부
+- Throttling: 일정 기간 허용 최대 횟수
+
+### 인증 처리 순서 (클라이언트에서 서버에 요청시 매번 인증)
+
+1. 매 요청시 APIView의 dispatch(request) 호출
+2. APIView의 Initial(request) 호출
+3. APIView의 perform_authentication(request) 호출
+4. request의 user 호출
+5. request의 _authentiacate() 호출 
+
+### 지원 인증 종류
+
+- SessionAuthentication
+  - 세션을 이용한 인증 (APIView에서 default set)
+  - 장고 기본 앱에서 `django.contrib.auth`를 이용해 지원 (로그인, 로그아웃)
+- BasicAuthentication
+  - Basic 인증 헤더를 이용한 인증 (Authorization -> Basic "암호")
+  - HTTPie를 통한 요청 -> `http --auth 유저명:암호 --form POST :8000 필드명1:값 필드명2:값`
+- TokenAuthentication
+  - Token 헤더를 이용한 인증 (Authorization -> Token "토큰암호")
+  - 단점: 만료 시점이 없고 기본 토큰은 1개만 부여되기에 유출시 위험
+- RemoteuserAuthentication
+
+
+
+## 인증과 허가
+
+클라이언트측에서 요청한 개체에 접근을 허용하기 위해 인증/식별만으로 충분하지 않고 유저마다 적절한 추가적 허가가 필요합니다.
+
+### DRF Permission 
+
+현재 요청에 따른 허용/거부 여부를 결정하고 APIView 단위별로 지정 가능
+
+- AllowAny (default 전역 설정): 인증 여부에 상관없이 View 호출 허용
+- IsAuthenticated: 인증된 요청에 한해 View 호출 허용
+- IsAdminUser: staff 인증 요청에 한해 View 호출 허용
+- isAuthenticatedOrReadOnly: 비 인증 요청엔 읽기만 허용
+- DjangoModelPermissions: 인증된 요청에 한해 View 호출 허용, 추가 장고 모델 단위 Permission 확인
+- DjangoModelPermissionsOrAnonReadOnly: DjangoModelPermissions에 비인증 요청엔 읽기만 허용
+- DjangoObjectPermissions: 비인증 요청은 거부, 인증 요청엔 Object 권한 체크
 
 
 
