@@ -506,7 +506,131 @@ class PostViewSet(ModelViewSet):
 
 
 
-## 
+## Renderer
+
+같은 EndPoint에 요청받은 타입에 알맞는 응답 포맷을 지원, Content-Type, URL 을 통해 Renderer 지정이 가능합니다.
+
+### default 지원 Renderer
+
+**JSONRenderer** : json.dumps를 사용해 JSON 직렬화
+
+- applications/json, format -> **json**
+
+**BrowsableAPIRenderer** : self-document HTML 렌더링
+
+- text/html, format -> **api**
+
+**TemplateHTMLRenderer** : 지정 템플릿을 이용한 렌더링
+
+### TemplateHTMLRenderer example code
+
+```python
+class PostDetail(RetrieveAPIView):
+		queryset = Post.objects.all() 
+		renderer_classes = [TemplateHTMLRenderer] # Renderer를 사용해 아래 template으로 출력
+		template_name = 'blog/post_detail.html'
+		
+		def get(self, request, *args, **kwargs):
+	      post = self.get_object() #get_object는 RetrieveAPIView 내에서 구현이 되어 있음
+				return Response({
+						'post': PostSerializer(post).data
+				})
+```
+
+### 다양한 Renderer
+
+- StaticHTMLRenderer : 미리 렌더링된 HTML를 반환, Response로 응답 보낼시 HTML 문자열 전송
+- AdminRenderer, HTMLFormRenderer, MultiPartRenderer 등등
+
+
+
+## 응답 헤더 포맷
+
+### Accept 헤더
+
+- Accept: text/html
+- Accept: applications/json
+
+### a=Get인자 => format
+
+- ?format=json
+- ?formant=api
+
+
+
+## Renderer 클래스 리스트 지정
+
+### 전역
+
+settings -> REST_FRAMEWORK -> DEFAULT_RENDERER_CLASSES 문자열로 지정(리스트)
+
+### APIView마다 지정
+
+queryset, serializer_class, renderer_class 
+
+### @api_vew마다 지정
+
+- URL Captured Vaue는 keyword args를 통해 전달됩니다. format 인자를 받는 설정했다면 format 인자 추가 작업 `(formant=)`
+
+
+
+## Form과 Serializer의 비교
+
+- Serializer&ModelSerializer 는 Form&ModelForm과 유사
+- 데이터 변환 및 직렬화 지원 (QuerySet&Model 객체)
+- Serializer는 View 응답을 처리하는데 범용적이고 강력한 장점
+- ModelSerializer는 Serializer를 생성하기 위한 Shortcut 개념
+
+
+
+## Form과 Serializer의 특징
+
+### Form & ModelForm
+
+- HTML 입력 폼을 이용한 유효성 검사
+  - HTML Form Submit을 통해 비동기 호출 (Android/iOS에 의한 http 요청도 포함)
+- Create or Update 에 대한 처리 활용 -> django admin 
+- CreateView/UpdateView CBV를 활용한 View 처리 (단일 수행 View)
+
+### Serializer&ModelSerializer
+
+- 데이터 변환 및 직렬화 (JSON 포맷)
+  - 다양한 Client에 대한 Data 위주 http 요청 (Web, iOS, RNApp, Android)
+- Web API 포맷에 대한 유효성 검사
+- List/Create 또는 특정 데이터에 대한 Retrieve/Edit/Delete 등에 활용
+- APIView를 통한 단일 View 처리
+- ViewSet을 통한 2개 View, 2개 URL 처리
+
+
+
+## Serializer 의 생성자
+
+```python
+class BaseSerializer(Field):
+		def __init__(self, instance=None, data=empty, **kwargs): # 첫번째 인자 instance (Model 객체 혹은 QuerySet), 유효성검사는 data
+```
+
+
+
+### data= 인수가 전달된 경우
+
+- .is_valid() - 사용할 수 있습니다.
+- .initial_data - 사용 가능
+- .validated_data - 'is_valid()' 호출 후(유효성 검증 후)에만 사용할 수 있고 .save()할 때 사용합니다.
+- .error - 'is_valid()'를 호출한 후(유효성 검증 후)에만 사용할 수 있습니다.
+- .data - is_valid()를 호출한 후(유효성 검증 후)에만 사용할 수 있습니다.
+
+### serializer.save(**kwargs) 호출 할 때
+
+- DB에 저장한 관련 instance를 리턴
+- .validated_data와 kwargs dict을 합친 데이터 다음 요청과 같이 수행한다.
+  - .update & .create 함수를 통해 필드에 값을 할당 후 DB insert
+    - .update() : self.instance 인자를 지정시
+    - .create() : self.instance 인자를 지정하지 않았을 시
+
+
+
+
 
 ## Reference
 
