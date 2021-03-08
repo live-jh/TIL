@@ -718,6 +718,38 @@ Create시 추가로 DB 반영(저장, 수정, 삭제)
 - DjangoModelPermissionsOrAnonReadOnly: DjangoModelPermissions에 비인증 요청엔 읽기만 허용
 - DjangoObjectPermissions: 비인증 요청은 거부, 인증 요청엔 Object 권한 체크
 
+### Default global setting
+
+```python
+REST_FRAMEWORK = {
+		'DEFAULT_PERMISSION_CLASSES': [
+				'rest_framework.permissions.AllowAny',
+		]
+}
+```
+
+### Custom permission
+
+Permission 클래스는 2가지 함수를 구현할 수 있습니다.
+
+- has_permission(request, view)
+  - api 접근시 체크
+  - Permission 클래스에서 구현하며 로직에 따라 True/False 반환
+- has_object_permission
+  - APIView의 self.get_object 함수를 통해 object 반환시 체크
+  - DjangoObjectPermissions에서 구현하며 로직에 따라 True/False 반환
+  - 브라우저를 이용해 API 접근할때 CREATE/UPDATE Form 노출시 체크
+
+### has_object_permission 
+
+SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']  -> 조회 요청 (인증 여부에 상관없이 허용)
+
+PUT, DELETE는 저자와 유저가 같아야 허용
+
+- get : get 요청
+- head : 실제 응답 head만 받아보는 기능
+- options : 엔드포인트에서 어떤 메소드를 지원하는지 알려주는 인터페이스
+
 
 
 ## Reference
