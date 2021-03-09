@@ -305,7 +305,7 @@ method api_view -> decorator함수내에 APIView클래스를 활용해서 사용
 
 ### authentication: 인증 클래스 (유저 식별)
 
-- sessionAuthentication: 세션기반 인증
+- SessionAuthentication: 세션기반 인증
 - BasicAuthentication: HTTP basic 인증
 
 ### throttle : 요청 제한 클래스
@@ -691,14 +691,27 @@ Create시 추가로 DB 반영(저장, 수정, 삭제)
 
 - SessionAuthentication
   - 세션을 이용한 인증 (APIView에서 default set)
+    - 웹프론트엔드와 장고가 같은 host를 사용시 가능 (nginx 활용), 외부 서비스 및 앱에선 사용 불가
   - 장고 기본 앱에서 `django.contrib.auth`를 이용해 지원 (로그인, 로그아웃)
 - BasicAuthentication
   - Basic 인증 헤더를 이용한 인증 (Authorization -> Basic "암호")
+  - 외부 서비스/앱에서 매번 헤더에 유저 정보를 넘기는 것은 보안상 위험하고 하지 말아야할 것
   - HTTPie를 통한 요청 -> `http --auth 유저명:암호 --form POST :8000 필드명1:값 필드명2:값`
 - TokenAuthentication
   - Token 헤더를 이용한 인증 (Authorization -> Token "토큰암호")
+  - username/password 로 Token을 발급받고 토큰에 API 요청을 담아 보내 인증처리
   - 단점: 만료 시점이 없고 기본 토큰은 1개만 부여되기에 유출시 위험
 - RemoteuserAuthentication
+
+### Token Model
+
+User 모델과 1:1 관계이며 각 User별 토큰을 수동 생성해야 합니다. Token은 유저별로 유일하며 오직 Token으로만 인증을 수행합니다.
+
+### Token 생성 방법
+
+- ObtainAuthToken: View를 이용한 get_or_create (url 매핑 필요)
+- Signal: signal을 이용한 자동 생성
+- Management: 명령을 이용한 생성
 
 
 
@@ -749,6 +762,140 @@ PUT, DELETE는 저자와 유저가 같아야 허용
 - get : get 요청
 - head : 실제 응답 head만 받아보는 기능
 - options : 엔드포인트에서 어떤 메소드를 지원하는지 알려주는 인터페이스
+
+
+
+
+
+
+
+
+
+## Pagination
+
+- PageNumber
+  - page/page_size 인자를 이용한 처리 
+- LimitOffset
+  - offset/limit 인자를 이용한 처리
+
+### PageNumberPagination
+
+page_size default 지정이 필요, `setting.py` 내 `REST_FRAMEWORK = {"PAGE_SIZE" : 10}` 선언하여 전역 설정 가능합니다.
+
+특정 API내에 custom page size를 지정시 PageNumberPagination을 상속받아 사용할 수 있습니다.
+
+```python
+class MyLimitOffsetPagination(LimiOffsetPagination):
+		page_size = 10
+```
+
+### settings에 pagination 설정 전 후 차이 (좌: True, 우: False)
+
+![image](https://user-images.githubusercontent.com/48043799/110532552-52260900-8160-11eb-8cac-d6a4b1103031.png)
+
+
+
+## Throttling
+
+최대 호출 횟수 제한하기
+
+- Rate: 지정 기간내 허용할 최대 호출 횟수
+- Scope: Rate에 대한 별칭
+- Throttle: 특정 조건에 최대 호출 횟수를 결정하는 로직 구현 클래스
+
+### Default Throttle
+
+- AnonRateThrottle
+  - 인증 요청 제한 x
+  - 비인증 요청은 IP 단위로 횟수 제한
+- UserRateThrottle
+  - 유저 단위로 횟수 제한
+  - 비인증 요청은 IP 단위로 횟수 제한
+- ScopedRateThrottle
+  - 유저 단위로 횟수 제한
+  - 비인증 요청은 IP 단위로 횟수 제한
+  - APIView내 throttle_scope 설정을 체크하여 개별로 서로 다른 Scope를 적용
+
+### Setting example
+
+```python
+# default
+REST_FRAMEWORK = {
+		'DEFAULT_THROTTLE_CLASSES': [],
+		'DEFAULT_THROTTLE_RATES': {
+				'anon': None,
+				'user': None,
+      	'upload': '20/day',
+      	'contact': '100/day'
+		}
+}
+
+# setting 
+REST_FRAMEWORK = {
+		'DEFAULT_THROTTLE_CLASSES': [
+      	'rest_framework.throttling.UserRateThrottle'
+    ],
+		'DEFAULT_THROTTLE_RATES': {
+				'user': '7/day', # 7times a day -> message if exceeded "Too Many Request"
+		}
+}
+
+# ViewSet (APIView 별)
+from rest_framework.throttling import UserRateThrottle
+class PostViewSet(ViewSet):
+  		throttle_classes = UserRateThrottle
+    
+    
+# API별로 서로 다른 Rate 적용 exam
+class ContactListView(APIView):
+  		throttle_scope = 'contact' # 1000 times a day
+    
+class UploadView(APIView):
+		  throttle_scope = 'upload' # 20 times a day
+```
+
+ 
+
+### TooManyRequests
+
+예외 메세지를 통해 Retry-After: 86396 형태로 재요청 보낼 수 있는 시점을 안내해줍니다. (Throttle의 wait 멤버함수를 이용해 계산)
+
+
+
+## Cache
+
+### cache-list
+
+기본 setting의 default는 로컬 메모리 캐시입니다. (서버가 재시작시 캐시는 초기화)
+
+- memcached cache: django.core.cache.backends.MemcachedCache
+- db cache: django.core.cache.backends.DatabaseCache (not support)
+- file system cache: django.core.cache.backends.FIleBasedCache (not support)
+- local memory cache: django.core.cache.backends.LocMemCache
+
+### Redis를 활용한 캐시
+
+[django-redis-cache](https://github.com/sebleier/django-redis-cache)
+
+요청시 cache에선 timestamp list를 get/set하며 SimpleRateThrottle에는 다음과 같이 default 캐시 설정
+
+```python
+from django.core.cache import cache as default_cache
+
+class SimpleRateThrottle(BaseThrottle): # 코드 참고 (rest_framework/throttling)
+		cache = default_cache
+```
+
+### Setting format
+
+- 포맷:  "숫자/간격"
+- 숫자: 지정 간격내 최대 요청 제한 횟수
+- 간격: 지정 문자열의 첫글자만 사용
+  - "s": 초, "m": 분, "h": 시, "d": 일
+
+### IP 단위의 요청 기준
+
+X-Forwarded-For > REMOTE_ADDR 순으로 헤더를 참조해서 확인 (Load-Balancer or nginx등을 활용할 수 있기에)
 
 
 
