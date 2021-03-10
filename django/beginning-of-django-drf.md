@@ -765,9 +765,53 @@ PUT, DELETE는 저자와 유저가 같아야 허용
 
 
 
+## Filtering
 
+목록 조회 APIView에서 조건에 따라 필터링이 필요합니다.
 
+| APIView                                | @api_view                         |
+| -------------------------------------- | --------------------------------- |
+| self.request.user                      | request.user                      |
+| self.request.GET                       | request.GET                       |
+| self.request.query_parmas (GET과 동일) | request.query_params (GET과 동일) |
+| self.kwargs                            | 함수 키워드 인자                  |
 
+### 직접 Filtering의 example
+
+```python
+# 직접 Filtering의 example -> ListAPIView -> get_queryset
+
+class PostListAPIView(generics.ListAPIView):
+		queryset = Post.objects.all()
+		
+    # 멤버함수를 구현하여 queryset을 커스터마이징 가능
+		def get_queryset(self):
+				q = self.request.query_params.get('q', '')
+				qs = super().get_queryset()
+				if q:
+					qs = qs.filter(title__icontains=q)
+				return qs
+```
+
+### Generic Filtering example
+
+```python
+# Django Admin의 Search 기능과 유사함
+
+class PostModelViewSet(viewsets.ModelViewSet):
+  		filter_backends = [SearchFilter, OrderingFilter] # ?search="검색", ?ordering="필드명"
+	    search_fields = ['message'] # queryset 조건에 추가할 필드 지정 (문자열 필드만 가능, 지정하지 않으면 적용 x)
+      ordering_fields = ['id'] #정렬을 허용할 필드 (미지정시 serializer_class 지정 필드) 
+      ordering = ['id'] #default ordering 지정
+```
+
+### Search_fields의 문자열 패턴 지정 (잘 사용하지 않음)
+
+- "^" : starts-with search (시작 단어 적용)
+- "=" : Exact matches (정확히 매칭)
+- "@" : Full-text search (단어/구문 검색, mysql 백엔드만 지원)
+- "$" : Regex search
+- get_search_fields 함수로도 구현 가능
 
 
 
