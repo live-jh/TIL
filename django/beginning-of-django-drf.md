@@ -943,6 +943,24 @@ X-Forwarded-For > REMOTE_ADDR 순으로 헤더를 참조해서 확인 (Load-Bala
 
 
 
+## JWT(Json Web Token)
+
+DB에서 따로 조회하지 않고 로직만으로 인증 가능합니다. 포맷은 "header.payload.signature"이며 별도의 비밀키를 생성하여 발급시간, 유저 정보등을 저장할 수 있습니다.
+
+서명은 **암호화**가 아니기에 보안 데이터보다는 최소한의 필요 정보만 넣어 사용하는게 좋습니다.
+
+장고에서는 settings.SECRET_KEY 또는 JWT_SECRET_KEY 를 통해 설정하고 Token 유효기간을 지정하여 갱신거나 유저정보를 통해 재인증을 할수도 있습니다. (이미 발급된 Token을 폐기하는 것은 불가)
+
+
+
+### Token 저장 Tip
+
+스마트폰의 경우 앱별로 안전한 공간에 저장되어지지만 웹은 그렇지 않기에 세션인증이 더 나을 수도 있는 점을 고려하고 통신은 `https` 필수
+
+
+
+
+
 ## Reference
 
 - https://educast.com/course/web/ZU53/
