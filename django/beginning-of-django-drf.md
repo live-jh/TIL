@@ -945,19 +945,130 @@ X-Forwarded-For > REMOTE_ADDR 순으로 헤더를 참조해서 확인 (Load-Bala
 
 ## JWT(Json Web Token)
 
-DB에서 따로 조회하지 않고 로직만으로 인증 가능합니다. 포맷은 "header.payload.signature"이며 별도의 비밀키를 생성하여 발급시간, 유저 정보등을 저장할 수 있습니다.
+DRF에서 기본 지원 Token은 단순 랜덤 문자열을 이용해 User와 1:1 매칭으로 유효기간 없이 사용하기에 이는 의미있는 데이터를 가지고 있지 않습니다.
+
+이에 반해 JWT는 DB에서 따로 조회하지 않고 로직만으로 인증 가능한 Token의 기능을 합니다. 
+
+토큰을 요청한 유저는 username, password를 제공해야하고, 해당 정보를 통해 일치하면 Token을 발급해주는데 서버에선 임의로 정한 비밀키로 서명(Format: `"header.payload.signature"`) 을 생성하고 발급시간, 유저 정보등을 key/value 형식으로 제공합니다.
 
 서명은 **암호화**가 아니기에 보안 데이터보다는 최소한의 필요 정보만 넣어 사용하는게 좋습니다.
 
-장고에서는 settings.SECRET_KEY 또는 JWT_SECRET_KEY 를 통해 설정하고 Token 유효기간을 지정하여 갱신거나 유저정보를 통해 재인증을 할수도 있습니다. (이미 발급된 Token을 폐기하는 것은 불가)
+장고에서는 settings.SECRET_KEY 또는 JWT_SECRET_KEY 를 통해 설정하고 Token **유효기간을 지정하여 갱신**거나 **유저정보를 통해 재인증**을 할수도 있습니다. 이미 발급된 Token을 폐기하는 것은 불가합니다.
 
+```python
+#Token 예시
+TOKEN = 'c14a8ebace3b5b7d80d0849109a4138d0114c48b'
 
+#JWT 예시
+JWT_TOKEN = (
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9' # header
+    '.eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImRlbW8iLCJleHAiOjE2MTU2MDQzMzgsImVtYWlsIjoiIiwib3JpZ19pYXQiOjE2MTU2MDQwMzh9' # payload
+    '.v94ZTNnsBT6GJFd1AMchiwRcxN9Afn2fH5Tvvk_E2lk') # signature
+```
 
 ### Token 저장 Tip
 
 스마트폰의 경우 앱별로 안전한 공간에 저장되어지지만 웹은 그렇지 않기에 세션인증이 더 나을 수도 있는 점을 고려하고 통신은 `https` 필수
 
+### DRF JWT Setting
 
+- 패키지 설치
+
+  - `$ pip install djangorestframework-jwt`
+
+  - `urls.py`에 package url 등록
+
+    - `path('api-jwt-auth/', obtain_jwt_token)`
+    - `path('api-jwt-auth/refresh/', refresh_jwt_token)`
+    - `path('api-jwt-auth/verify/', verify_jwt_token)`
+
+  - project `settings.py` 에 REST_FRAMEWORK 추가
+
+    - ```python
+      'DEFAULT_AUTHENTICATION_CLASSES': [
+      	'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+      ]
+      ```
+
+  - project `settings.py` 에 JWT_AUTH 추가 (갱신 허용 여부)
+
+    - ```python
+      JWT_AUTH = { 
+          'JWT_ALLOW_REFRESH': True, 
+      }
+      ```
+
+
+
+### Httpie를 통한 JWT 발급
+
+POST 요청 
+
+`$ http POST http://localhost:8000/accounts/api-jwt-auth/ username="유저명" password="비밀번호"`
+
+```python
+# 성공시 응답 
+
+HTTP/1.1 200 OK
+Allow: POST, OPTIONS
+Content-Length: 201
+Content-Type: application/json
+Date: Sat, 13 Mar 2021 02:53:58 GMT
+Referrer-Policy: same-origin
+Server: WSGIServer/0.2 CPython/3.7.10
+Vary: Accept
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+
+{
+    "token":"토큰"
+}
+
+```
+
+인증에 실패시 400 Bad Request 응답이 오며 python에서는 base64를 활용하여 아래와 같이 decode하여 정보를 확인할 수 있으며 또 다른 방법으로 [jwt.io](https://jwt.io/#debugger) 에서 해당 토큰을 입력하여 정보를 확인할 수 있습니다.
+
+````python
+JWT_TOKEN = ('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.'
+             'eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImRlbW8iLCJleHAiOjE2MTU2MDM4NDQsImVtYW'
+             'lsIjoiIiwib3JpZ19pYXQiOjE2MTU2MDM1NDR9'
+             '.KeUZl8BxWnZYchOhR4Y3Ef96jxkyxwQprQjkyczef80')
+headers = {
+    'Authorization': f'JWT {JWT_TOKEN}'  # JWT Token 인증
+}
+
+print(b64decode(
+    'eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImRlbW8iLCJleHAiOjE2MTU2MDM4NDQsImVtYWlsIjoiIiwib3JpZ19pYXQiOjE2MTU2MDM1NDR9'))
+print(b64encode(b'{"user_id":4,"username":"demo","exp":1615603844,"email":"","orig_iat":1615603544}'))
+
+req = requests.get('http://localhost:8000/post/1/', headers=headers)
+
+# print b'{"user_id":4,"username":"demo","exp":1615603844,"email":"","orig_iat":1615603544}'
+# print b'eyJ1c2VyX2lkIjo0LCJ1c2VybmFtZSI6ImRlbW8iLCJleHAiOjE2MTU2MDM4NDQsImVtYWlsIjoiIiwib3JpZ19pYXQiOjE2MTU2MDM1NDR9'
+````
+
+### 발급받은 JWT Token 확인
+
+`$ http POST http://localhost:8000/api-jwt-auth/verify/ token="토큰명"`
+
+- 인증이 확인되면 Token을 그대로 리턴
+- 인증이 만료시 `"{detail: "Signature has expired}"` 반환
+
+### JWT Token 갱신
+
+`$ http POST http://localhost:8000/api-jwt-auth/refresh/ token="토큰명"`
+
+- 사전에 `settings.JWT_AUTH.JWT_ALLOW_REFRESH = True`로 설정이 되어야 갱신 가능
+- 유효기간내에 갱신하여야 가능한 요청
+  - settings.JWT_AUTH의 JWT_EXPIRATION_DELTA 참조 -> default : 5분
+
+### djangorestframework-jwt settings
+
+- "JWT_SECRET_KEY": settings.SECRET_KEY
+- "JWT_ALGORITHM": "HS256"
+- "JWT_EXPIRATION_DELTA": datetiem.timedelta(secondes=300) -> 만료시간 5분
+- "JWT_ALLOW_REFRESH": False
+- "JWT_REFRESH_EXPRIRATION_DELTA": datetime.timedelta(days=7)  -> 7일간 리프레쉬 기간
 
 
 
