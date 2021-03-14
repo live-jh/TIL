@@ -71,7 +71,7 @@ let [nick, height , age, region = "default 변수 및 함수 선언 가능"] = [
 console.log(region) //undefined
 ```
 
-### 비구조화 할당
+## 비구조화 할당 (Destructuring Assignment)
 
 **구조 분해 할당** 구문은 배열이나 객체의 속성을 해체해 개별 변수에 담는 것을 말합니다.
 
@@ -106,4 +106,102 @@ for (const {name, age} of people) {
 ```
 
 
+
+## 전개 연산자(Spread Operator)
+
+배열이나 문자열과 같이 **반복 가능한 문자**를 0개 이상의 변수로 확장하여 배열의 값을 하나하나 넘기는 용도로 사용합니다.
+
+```javascript
+// 기존 es5
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const newArr = arr1.concat(arr2);
+console.log(newArr);
+
+// es6 spread operator
+const arr3 = [1, 2, 3];
+const arr4 = [4, 5, 6];
+const newArr2 = [...arr3, ...arr4];
+console.log(newArr2);
+
+
+let person1 = {
+    name: "steve",
+    age: 1,
+    region: 'busan'
+}
+
+let person2 = {
+    ...person1,
+    name: "bill"
+}
+console.log(person1) // { name: 'steve', age: 1, region: 'busan' }
+console.log(person2) // { name: 'bill', age: 1, region: 'busan' } 필드명 중복시 마지막 값
+```
+
+리액트에서는 많은 값들을 **불변 객체**로 처리하며 이때 전개연산자를 사용하게 되는데 복잡한 구조일 경우는 `immer 라이브러리`를 사용합니다.
+
+
+
+## Named Parameters (객체 비구조화 할당 활용)
+
+```javascript
+function print_func({name, age}) {
+		console.log(name, age)
+}
+
+print_func({name: "james", age: 12}) //javascript
+```
+
+```python
+def print_func(name, age):
+		print(name, age)
+		
+print_func(name="james", age=12) #python
+```
+
+## 
+
+## Arrow Function
+
+return을 선언하지 않아도 계산된 함수의 값을 반환, 인자가 1개일 경우 소괄호 생략이 가능합니다.
+
+```javascript
+let paul = (name, age) => `${name}은 ${age}살`;
+console.log(paul("paul", 10))
+
+const plus_func = (x, y) => { //const plus_arrow_func = (x, y) => x+y; 같은 표현
+  return x+y;
+}
+// this, args를 바인딩하지 않습니다. 
+```
+
+### 함수의 다양한 형태
+
+```javascript
+const sum1 = (x, y) => x + y;
+const sum2 = (x, y) => {x, y};
+const sum3 = (x, y) => ({x: x, y: y}); 
+const sum4 = (x, y) => {x: x, y: y};
+const sum5 = function(x, y) {
+  return {x: x, y: y};
+};
+function sum6(x, y) {
+  return {x: x, y: y};
+}
+```
+
+
+
+## ES6 module
+
+react를 사용할때 쓰는 모듈 시스템이며 IE를 포함한 구형 브라우저는 지원하지 않습니다.
+
+문법은 `import " " from ... ` 으로 사용합니다.
+
+
+
+## 고차함수(HOF)
+
+함수를 인자로 전달받거나 리턴이 가능하고 다른 함수 자체를 조작하는 함수이며 함수 또는 클래스는 모두 객체이어야 합니다.
 
