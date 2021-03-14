@@ -34,8 +34,8 @@ JavaScript는 Obj, Array에 대해 대입시 얕은 복사를 통해 복사됩�
 
 ```javascript
 const obj_1 = {val: 10};
-const obj_2 = obj_1; //얕은 복사 
-const obj_3 = JSON.parse(JSON.stringify(obj_1)) //새로운 객체 복사
+const obj_2 = obj_1; // 얕은 복사 
+const obj_3 = JSON.parse(JSON.stringify(obj_1)) // 새로운 객체 복사
 obj_2.val += 1;
 
 console.log("obj_1", obj_1) // obj_1 { val: 11 }
@@ -50,8 +50,8 @@ const str = `텍스트 문자열입니다.
 띄어쓰기도 가능합니다. ${1 + 1}`
 console.log(str) 
 
-//텍스트 문자열입니다.
-//줄바꿈도 가능합니다. 2
+// 텍스트 문자열입니다.
+// 줄바꿈도 가능합니다. 2
 
 ```
 
@@ -65,10 +65,10 @@ let [, demo, ] = ['cc', 323, '10'] // 갯수가 같지 않아도 에러 x
 console.log(demo)
 
 let [nick, height , age, region] = ['tim', 187, 20]
-console.log(region) //default -> undefined
+console.log(region) // default -> undefined
 
 let [nick, height , age, region = "default 변수 및 함수 선언 가능"] = ['tim', 187, 20]
-console.log(region) //undefined
+console.log(region) // undefined
 ```
 
 ## 비구조화 할당 (Destructuring Assignment)
@@ -82,7 +82,7 @@ const live = {
 		region: 'earth'
 }
 
-const {age, region} = live; //객채에 필요한 값만 뽑아서 사용할 수 있고 없는 값을 변수로 선언시 undefined
+const {age, region} = live; // 객채에 필요한 값만 뽑아서 사용할 수 있고 없는 값을 변수로 선언시 undefined
 
 
 const demo_func_1 = (obj) => {
@@ -150,14 +150,14 @@ function print_func({name, age}) {
 		console.log(name, age)
 }
 
-print_func({name: "james", age: 12}) //javascript
+print_func({name: "james", age: 12}) // javascript
 ```
 
 ```python
 def print_func(name, age):
 		print(name, age)
 		
-print_func(name="james", age=12) #python
+print_func(name="james", age=12) # python
 ```
 
 ## 
@@ -170,7 +170,7 @@ return을 선언하지 않아도 계산된 함수의 값을 반환, 인자가 1�
 let paul = (name, age) => `${name}은 ${age}살`;
 console.log(paul("paul", 10))
 
-const plus_func = (x, y) => { //const plus_arrow_func = (x, y) => x+y; 같은 표현
+const plus_func = (x, y) => { // const plus_arrow_func = (x, y) => x+y; 같은 표현
   return x+y;
 }
 // this, args를 바인딩하지 않습니다. 
@@ -204,4 +204,61 @@ react를 사용할때 쓰는 모듈 시스템이며 IE를 포함한 구형 브�
 ## 고차함수(HOF)
 
 함수를 인자로 전달받거나 리턴이 가능하고 다른 함수 자체를 조작하는 함수이며 함수 또는 클래스는 모두 객체이어야 합니다.
+
+```javascript
+// arrow function 및 고차함수 표기
+const base_10 = fn => (x, y) => fn(x, y) + 10;
+const mysum = (a, b) => a + b;
+
+const return_fn = base_10(mysum); // 인자의 mysum은 mysum 함수가 아니라 base_10 내부의 wrap함수 1, 2는 wrap의 인자
+console.log(return_fn(1, 2))
+```
+
+
+
+## 리액트의 함수형 프로그래밍
+
+- 순수 함수로써의 기능을 유지한 채 코드 작성
+  - **상태값**과 **속성값**이 같으면 항상 같은 값을 반환해야합니다.
+  - 또 다른 side effects를 발생시키지 않아야 합니다.(저장, 쿠키 변경, http 요청등)
+- 컴포넌트의 상태값은 불변 객체(Immutable)로 관리해야합니다.
+  - 기존값 변경 x -> 같은 이름의 새로운 객체 반환
+
+## 순수 함수(Pure Function)
+
+```javascript
+let person1 = {
+    name: "steve",
+    age: 1,
+    is_checed: false
+}
+
+const pure_func = (person) => {
+    return {
+        ...person,
+        is_checed: true
+    }
+}
+
+console.log(pure_func(person1))
+
+// 순수함수를 활용한 데이터 변환
+// reduce, filter, map, join등
+const numbers = [3,5,123]
+const number = numbers.reduce((acc, n) => acc + n, 0); // accumulate 의 초기값 0
+const even_numbers = numbers.filter(i => i % 2 == 0); // 짝수 찾기 배열 리턴
+ 
+```
+
+## 커링(Currying)
+
+일부의 인자가 고정된 새로운 함수를 반환하는 기능의 함수를 만드는 기법입니다. 리액트에서는 HOF, Hook등 전반적으로 많이 사용됩니다.
+
+```javascript
+const userPost = username => message => {
+		console.log(`${username} - ${message}`);
+}
+const post = userPost("livejh")
+post("Hello")
+```
 
