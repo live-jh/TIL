@@ -262,3 +262,45 @@ const post = userPost("livejh")
 post("Hello")
 ```
 
+
+
+## Babel과 Webpack
+
+### Babel
+
+바벨은 자바스크립트 컴파일러로 쉽게 말해 최신 사양의 자바스크립트코드를 각 브라우저의 버전별로 동작할 수 있도록 변환해주는 기능을 합니다. 리액트를 사용시 튜토리얼을 따라하다보면 babel을 사용하게 되지만 결국 자바스크립트를 기본으로 사용할 시엔 babel도 함께 사용하는 것이 바람직합니다.
+
+### Webpack
+
+웹팩은 자바스크립트 어플리케이션의 정적 모듈 번들을 말합니다. 복잡한 애플리케이션 서비스가 많아짐에 따라 자바스크립트 파일들의 규모 또한 커지게 되어 관리와 효율적 측면이 필요하게 되었습니다. 이로 인해 탄생한 것이 웹팩이고 간단히 다수의 자바스크립트 파일을 하나의 자바스크립트로 모듈(번들)화 하는 것을 말합니다. (모듈성, 네트워크 성능 향상)
+
+### 특징
+
+- 코드가 필요시 로딩
+- Minifying: 불필요한 코드, 공백/줄바꿈, 긴 이름, 파일크기 줄이는 기능
+- HMR: 개발모드에서 원본 소스 변경을 감지하여 변경 모듈만 즉시 생신
+
+### 필요 유틸리티 라이브러리
+
+- `$ npm install --global yarn`
+- `$ yarn global add webpack webpack-cli`
+  - 개발시 필요한 라이브러리 `$ yarn add --dev @bable/core bable-loader @babel/preset-env @babel/preset-react`
+  - 프로덕션에 필요한 라이브러리 `$ yarn add react react-dom`
+
+## create-react-app
+
+react 프로젝트를 생성해주는 명령어로 webpack, babel, eslilnt 등 기본 설정으로 이루어진 리액트 프로젝트를 생성하는 기능을 수행합니다.
+
+`$ yarn global add create-react-app`
+
+`$ npm install -g create-react-app`
+
+### 프로젝트 생성
+
+`$ create-react-app <프로젝트 디렉토리>`
+
+### 절대경로 지정 방법
+
+- pycharm: src -> 마우스 우클릭 -> Mark Directory as -> Resource Root 선택
+- jsconfig.json 파일 생성 후 `{"compilerOptions": {"baseUrl": "src"},"include": ["src"]}` 입력
+
