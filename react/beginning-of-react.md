@@ -19,6 +19,15 @@ yarn은 페이스북 주도로 개발된 패키지 관리자입니다. 설치 �
 - Node는 파이썬과 다르게 default로 로컬에 설치되며 전역 설치에 대한 옵션은 `--global`
   - 파이썬은 default로 전역에 설치되며 로컬 설치를 위해 가상환경을 사용합니다.
 
+### npm or yarn command
+
+- default install : ./node_modules 디렉토리에 패키지 설치
+  - `$ npm install [package_name]`
+- --save : ./node_modules 디렉토리 패키지 설치 + /package.json dependencies에 추가
+  - `$ npm install [package_name] -- save
+- --save-dev : ./node_modules 디렉토리 패키지 설치 + /package.json Dev/dependencies에 추
+  - `$ npm install [package_name] -- save-dev
+
 
 
 ## 상수/변수
@@ -224,6 +233,8 @@ console.log(return_fn(1, 2))
 - 컴포넌트의 상태값은 불변 객체(Immutable)로 관리해야합니다.
   - 기존값 변경 x -> 같은 이름의 새로운 객체 반환
 
+
+
 ## 순수 함수(Pure Function)
 
 ```javascript
@@ -249,6 +260,8 @@ const number = numbers.reduce((acc, n) => acc + n, 0); // accumulate 의 초기�
 const even_numbers = numbers.filter(i => i % 2 == 0); // 짝수 찾기 배열 리턴
  
 ```
+
+
 
 ## 커링(Currying)
 
@@ -303,4 +316,101 @@ react 프로젝트를 생성해주는 명령어로 webpack, babel, eslilnt 등 �
 
 - pycharm: src -> 마우스 우클릭 -> Mark Directory as -> Resource Root 선택
 - jsconfig.json 파일 생성 후 `{"compilerOptions": {"baseUrl": "src"},"include": ["src"]}` 입력
+
+
+
+## React Element
+
+UI 데이터를 관리하는 방법 제공하고 화면을 담당합니다. React앱의 가장 작은 단위로 UI 데이터가 변경될때 해당 컴포넌트의 `render() ` 함수가 호출되어 화면을 자동 갱신하는 기능을 합니다.
+
+- 부모 컴포넌트로부터 내려받는 속성 -> props
+- 컴포넌트 내부에 생성되거나 관리하는 상태값 -> state
+
+함수형, 클래스형 2가지로 나뉘며 **클래스형 컴포넌트**는 `render() 함수 호출`, **함수형 컴포넌트**에선 `해당 함수`가 매번 호출됩니다. (함수형의 경우 Hook으로 관리)
+
+### React 개발의 핵심 (선언적 UI)
+
+UI에 노출되는 값들을 효율적으로 관리하고, 변경됨에 따라 필요한 UI만 변경되도록 하는 방법으로 개발하며 DOM에 직접 접근하여 추가, 변경, 삭제하는 것을 지양합니다.
+
+또한 **직접 상태값을 변경하는 것은 성능 하락 이슈**가 있으며 때에 따라 강제 업데이트를 하는 경우외에는 잘 사용하지 않습니다.
+
+```react
+import React, {useState} from "react";
+import 'App.css';
+
+function Counter(props) {
+    const [num, setNum] = useState({value: props.initValue});
+    const {value} = num;
+    return (
+        <div>
+            <button onClick={() => {
+                setNum({...num, value: value + 1})
+            }}>
+                1씩 더하기
+            </button>
+            <button onClick={() => {
+                if (value === 0) alert("0 이하로는 못내려요!")
+                else setNum({...num, value: value - 1})
+            }}>
+                1씩 빼기
+            </button>
+            <div style={{marginTop: "10px"}}>
+                <span>현재 숫자 : {value}</span>
+            </div>
+        </div>
+    );
+}
+
+export default Counter;
+
+```
+
+### 문법 종류 
+
+- JS 문법
+  - `$ const reactElem = React.createElement('h1', null, "CCO CEO CTO")`
+  - 번거롭고 선언해야할 것, 코드의 길이가 많아짐
+- JSX 문법
+  - JS문법의 확장, HTML과 비슷한 문법 사용 (babel을 통한 transpile이 필요)
+  - class 선언시 -> className
+  - 태그의 속성엔 `{}`  안에 식을 지정
+  - `$ const reactElem = <h1>CCO CEO CTO</h1>;`
+
+
+
+## React State
+
+**Default State**
+
+- 컴포넌트에서 사용되는 데이터들을 컴포넌트 안에서 생성 및 갱신하여 관리
+
+**Redux, ContextAPI, Mobx State**
+
+- 여러 컴포넌트에서 사용되는 데이터들을 별도 store 공간에서 생성 및 갱신하여 관리
+
+
+
+## setState
+
+- 클래스형 컴포넌트에선 setState는 유일한 상태값 **setter**
+- 객체 또는 함수, 변경 및 기능처리가 끝났을때 호출되는 콜백함수
+- 비동기로 동작
+- **함수를 지정 가능**하고 매개변수로 **호출되기 직전의 상태값**을 받을 수 있다. (immer 라이브러리)
+- 클래스형 컴포넌트 생성자에는 setState 호출은 무시
+  - setState 자체가 컴포넌트가 마운드된 이후만 **유효**
+  - 데이터를 가져오기 위해 API를 호출하고 응답을 바로 state에 적용할 때
+    - 클래스형 **componentDidMount()** 사용
+    - 함수형 **useEffect()** 사용
+
+```react
+onClick = () => {
+  			this.setState({value: this.state.value + 1}) 
+			  this.setState({value: this.state.value + 1}) // 값이 +1+1 총 2가 증가하는 게 아니라 1만 증가 -> 비동기처리
+  
+  
+        this.setState(prevState => ({value: prevState.value + 1}))
+        this.setState(prevState => ({value: prevState.value + 1})) // 이전 상태를 가져와서 +1을 해서 총 2 증가
+        this.setState(prevState => (console.log(prevState.value)))
+}
+```
 
