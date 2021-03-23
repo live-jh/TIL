@@ -330,9 +330,9 @@ UI 데이터를 관리하는 방법 제공하고 화면을 담당합니다. Reac
 
 ### React 개발의 핵심 (선언적 UI)
 
-UI에 노출되는 값들을 효율적으로 관리하고, 변경됨에 따라 필요한 UI만 변경되도록 하는 방법으로 개발하며 DOM에 직접 접근하여 추가, 변경, 삭제하는 것을 지양합니다.
-
-또한 **직접 상태값을 변경하는 것은 성능 하락 이슈**가 있으며 때에 따라 강제 업데이트를 하는 경우외에는 잘 사용하지 않습니다.
+- UI에 노출되는 값들을 효율적으로 관리하고, 변경됨에 따라 필요한 UI만 변경되도록 하는 방법으로 개발하며 DOM에 직접 접근하여 추가, 변경, 삭제하는 것을 지양합니다.
+- 직접 상태값을 변경하는 것은 성능 하락 이슈**가 있으며 때에 따라 강제 업데이트를 하는 경우외에는 잘 사용하지 않습니다.
+- 상태값에 따라 화면이 불필요하게 업데이트 되지 않게 해야합니다.
 
 ```react
 import React, {useState} from "react";
@@ -390,6 +390,19 @@ export default Counter;
 
 
 
+## State Managed
+
+**내부**
+
+- **this.setState** or **useState** 사용 또는 ContextAPI 사용
+
+**외부**
+
+- 외부에 별도 상태값 저장소 관리
+- 여러 컴포넌트의 공유될 정보(로그인, 유저정보)등을 dispatch 함수를 통해 관리 
+
+
+
 ## setState
 
 - 클래스형 컴포넌트에선 setState는 유일한 상태값 **setter**
@@ -414,3 +427,76 @@ onClick = () => {
 }
 ```
 
+
+
+## State Reducer pattern
+
+- 상태값의 직접적 변화를 주는 setter 함수를 제공하지 않음
+- 하나의 함수에 임의 객체를 넘겨받아 해당 상태값에 반영
+  - action 객체를 활용
+- 해당 애플리케이션에서 공유할 상태값들을 한 곳에서 관리 (store)
+- useReducer / ContextAPI 참고
+
+```react
+dispatch(action, state) { //prevState와 같이 직전 state가 default로 함께 넘어온다. 
+    const {type, payload} = action; 
+    if (type === "INCREMENT") {
+        const { value } = payload;
+        return {
+            ...state,
+            value: state.value + value,
+        }
+    } else {
+        return state;
+    }
+}
+
+const action = {
+    type : "INCREMENT",
+    payload: {value: 1},
+};
+    
+dispatch(action)
+```
+
+
+
+## Props
+
+컴포넌트 생성시 넘겨지는 값의 목록으로  **읽기 전용**으로 취급하고 **변경하지 않습니다**. 컴포넌트는 HOC(고차컴포넌트) 기법을 통해 Redux의 값이나 함수를 넘겨받을 수도 있습니다.
+
+컴포넌트가 생성되는 초기 state에 건내받고이후 state로 관리
+
+```react
+// exam-1
+getPostListLength() { //함수로 대응
+	return this.props.post_list.length;
+}
+
+//exam-2
+get postListLength() { //
+	return this.props.post_list.length;
+}
+
+//exam-3
+state = {
+	postLength: 0
+}
+static getDerivedStateFromProps(props, state) { // render 호출 직전 상태값을 갱신하여 반영
+	return {
+		postLength: this.props.post_list.length
+	};
+}
+```
+
+
+
+## React Life Cycle
+
+- Mounting 단계
+  - 
+- Updating 단계
+  - 새로운 props 전달 받을 때
+  - setState() 호출시
+  - forceUpdate 호출시
+- Unmounting 단계
