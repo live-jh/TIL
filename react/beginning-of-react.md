@@ -494,9 +494,81 @@ static getDerivedStateFromProps(props, state) { // render 호출 직전 상태�
 ## React Life Cycle
 
 - Mounting 단계
-  - 
-- Updating 단계
+  - constructor -> componentWillMount -> render -> componentDidMount
+- Updating 단계 
+  - props 변경시 : componentWillReceiveProps -> shouldComponentUpdate -> componentWillUpdate -> render -> componentDidUpdate
+  - state 변경시 : shouldComponentUpdate -> componentWillUpdate -> render -> componentDidUpdate
   - 새로운 props 전달 받을 때
   - setState() 호출시
   - forceUpdate 호출시
 - Unmounting 단계
+  - componentWillUnmount (컴포넌트 제거시)
+
+```react
+componentDidUpdate(prevProps) {
+		const {postId} = this.props;
+		if (postId !== prevProps.postId) { // id 변경 감지
+				//do something
+		}
+}
+```
+
+## 
+
+## 속성값의 타입 명시 & 필수 설정
+
+TypeScript 사용 또는 prop-types 패키지 통해 지정할 수 있습니다.
+
+- `$ npm i prop-types`
+- `$ yarn add prop-types`
+
+```react
+//클래스형
+class Person extends Component {
+		static propTypes = {
+				name: PropTypes.string.isRequired, //문자, required
+				age: PropTypes.number.isRequired, //int, required
+		}
+		
+		static defaultProps = {
+				name: "bill"
+		};
+		
+		render() {
+				const {name, age} = this.props;
+				return (
+						<div>
+								<h1>Name: {name}</h1>
+								<p>age: {age}</p>
+						</div>
+				)
+		}
+}
+
+//함수형
+function Person({name, age}) {
+  return (
+  		<div>
+					<h1>Name: {name}</h1>
+					<p>age: {age}</p>
+			</div>
+  )
+}
+
+Person.defaultProps = {
+		name: "bill"
+}
+
+Person.propTypes = {
+		name: PropTypes.string.isRequired, //문자, required
+		age: PropTypes.number.isRequired, //int, required
+}
+```
+
+
+
+## recompose HOC
+
+- `$ npm i recompose`
+- `$ yarn add recompose`
+
