@@ -506,10 +506,10 @@ static getDerivedStateFromProps(props, state) { // render 호출 직전 상태�
 
 ```react
 componentDidUpdate(prevProps) {
-		const {postId} = this.props;
-		if (postId !== prevProps.postId) { // id 변경 감지
-				//do something
-		}
+    const {postId} = this.props;
+    if (postId !== prevProps.postId) { // id 변경 감지
+        //do something
+    }
 }
 ```
 
@@ -525,50 +525,77 @@ TypeScript 사용 또는 prop-types 패키지 통해 지정할 수 있습니다.
 ```react
 //클래스형
 class Person extends Component {
-		static propTypes = {
-				name: PropTypes.string.isRequired, //문자, required
-				age: PropTypes.number.isRequired, //int, required
-		}
-		
-		static defaultProps = {
-				name: "bill"
-		};
-		
-		render() {
-				const {name, age} = this.props;
-				return (
-						<div>
-								<h1>Name: {name}</h1>
-								<p>age: {age}</p>
-						</div>
-				)
-		}
+    static propTypes = {
+        name: PropTypes.string.isRequired, //문자, required
+        age: PropTypes.number.isRequired, //int, required
+    }
+
+    static defaultProps = {
+        name: "bill"
+    };
+
+    render() {
+        const {name, age} = this.props;
+        return (
+            <div>
+                <h1>Name: {name}</h1>
+                <p>age: {age}</p>
+            </div>
+        )
+    }
 }
 
 //함수형
 function Person({name, age}) {
-  return (
-  		<div>
-					<h1>Name: {name}</h1>
-					<p>age: {age}</p>
-			</div>
-  )
+    return (
+        <div>
+            <h1>Name: {name}</h1>
+            <p>age: {age}</p>
+        </div>
+    )
 }
 
 Person.defaultProps = {
-		name: "bill"
+    name: "bill"
 }
 
 Person.propTypes = {
-		name: PropTypes.string.isRequired, //문자, required
-		age: PropTypes.number.isRequired, //int, required
+    name: PropTypes.string.isRequired, //문자, required
+    age: PropTypes.number.isRequired, //int, required
 }
 ```
 
 
 
-## recompose HOC
+## recompose library (HOC)
 
-- `$ npm i recompose`
 - `$ yarn add recompose`
 
+```react
+import PropTypes from "prop-types";
+
+function ThemedButton({theme, label, ...restProps}) {
+    return (
+        <button className={`btn btn-${theme}`} {...restProps}>
+            {label}
+        </button>
+    )
+}
+
+ThemedButton.defaultProps = {
+    theme: "default",
+}
+
+ThemedButton.propTypes = {
+    theme: PropTypes.string,
+    label: PropTypes.string.isRequired
+}
+```
+
+
+
+## Event
+
+컴포넌트상엔 여러가지 이벤트가 발생하며 해당 이벤트핸들러 속성명은 **camelCase** 로 작성하며 필히 함수로 지정합니다.
+
+커스텀 리액트 컴포넌트에선 HTML 이벤트를 지원하지 않지만 내부 Element에서는 DOM 요소를 담아 핸들러 지정이 가능합니다.
