@@ -599,3 +599,29 @@ ThemedButton.propTypes = {
 컴포넌트상엔 여러가지 이벤트가 발생하며 해당 이벤트핸들러 속성명은 **camelCase** 로 작성하며 필히 함수로 지정합니다.
 
 커스텀 리액트 컴포넌트에선 HTML 이벤트를 지원하지 않지만 내부 Element에서는 DOM 요소를 담아 핸들러 지정이 가능합니다.
+
+
+
+## CSS
+
+전통적으론 CSS를 별도 파일에 저장해 link 태그를 사용해 웹페이지에 노출하도록 하였지만 이는 include 처리시 전역 설정이 되어 컴포넌트간 충돌이나 중복 적용이 발생할 수 있는 점을 고려 **컴포넌트 관점에서 컴포넌트 내부에서 관리 및 적용**하는 방법을 사용합니다.
+
+다른 컴포넌트에서 같은 className을 사용하다 보면 **한 페이지에 두 컴포넌트가 존재시 css가 겹쳐 나중에 import한 컴포넌트만 적용** 됩니다. 이를 방지하기 위해 사용하는 것이 **css-module**입니다.
+
+### css-module
+
+```react
+import PostStyle from ".Post.module.css"
+import CommentStyle from ".Comment.module.css"
+
+const Post = () => <div className={PostStyle.wrapper}>Post</div>;
+const Comment = () => <div className={CommentStyle.wrapper}>Post</div>;
+```
+
+css-module은 각 클래스명에 고유한 해시값이 적용되어 클래스명의 중복을 방지해주는 기능을 합니다.
+
+### Sass
+
+`$ yarn add --dev node-sass`
+
+scss/sass에서 변수, 중첩, 임포트, 함수, 연산등을 지원하는 것을 활용하여 중복을 방지합니다.
