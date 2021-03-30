@@ -625,3 +625,52 @@ css-module은 각 클래스명에 고유한 해시값이 적용되어 클래스�
 `$ yarn add --dev node-sass`
 
 scss/sass에서 변수, 중첩, 임포트, 함수, 연산등을 지원하는 것을 활용하여 중복을 방지합니다.
+
+```scss
+$text-color: orange;
+$background-color: blue; //변수 선언
+
+.wrapper {
+  color: lighten($text-color, 10%); //변수 활용
+  background-color: lighten($background-color, 10%);
+}
+```
+
+
+
+## 불변성(Immutable)
+
+리액트는 불변성을 유지하며 상태값을 업데이트해야합니다. 다음과 같은 예제처럼 작성합니다.
+
+```react
+const new_state = {
+	...todo,
+	is_checked: true
+}
+
+// 레몬, 수박을 제거하고 메론을 추가
+const fruits = ['사과', '레몬', '수박', '딸기']
+
+//bad
+fruits.splice(1,2,'메론')
+
+//good
+const new_fruits = {
+		...fruits.slice(0, 1),
+		'메론',
+		...fruits.slice(3)
+}
+
+//immer
+import {produce} from "immer";
+
+const newFruits = produce(fruits, draft => {
+  draft.splice(1, 2, '메론');
+})
+
+```
+
+### immer
+
+`$ yarn add immer`
+
