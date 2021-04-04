@@ -766,3 +766,69 @@ export default TodoList;
 
 
 
+## 클래스 컴포넌트
+
+- Render 단계
+  - **순수 함수**로 구성
+  - No Side Effects (API 호출, 쿠키, 로컬스토리지 접근 x)
+  - DOM에 반영될 변경사항 확인
+- Pre-Commit 단계
+  - DOM 읽기 가능
+- Commit 단계
+  - DOM 접근 가능 
+  - Side Effect 허용
+  - 이벤트 리스너, 스케줄링 등록 가능
+
+
+
+### Constructor
+
+초기 속성값으로 상태값을 생성시 구현합니다. 초기 props에 대한 대응 용도일뿐 변경되는 props에 대한 부분은 반영하지 않습니다. 
+
+setState는 mount 이후 유효하기 때문에 무시되며 외부 API 호출이 필요할 때는 `componentDidMount()` 에서 구현합니다.
+
+### 속성값의 변화에 따라 외부 API 호출이 필요시
+
+- 클래스 컴포넌트 `componentDidUpdate(prevProps)` 사용
+- 함수형 컴포넌트 `useEffect Hook ` 사용
+
+### 속성값을 계산하여 상태값 업데이트시
+
+- 함수형 컴포넌트 `momoize 패키지 사용`
+  - `import memoize from 'lodash/memoize';`
+
+### Render()
+
+화면에 보여질 내용 반환 (함수형 컴포넌트는 함수 자체 return)
+
+- 반환 타입 : 리액트 컴포넌트, Array(Key 속성 필요), null/bool, 문자열, 숫자등 속성과 상태값으로 반환값 결정
+- 조건부 렌더링 가능 : null or false 반환
+
+###componentDidMount() 
+
+- 이벤트 리스너 등록시 (함수형 컴포넌트에서는 didUpdate와 함께 useEffect 훅을 사용)
+- 실행 이후 꼭 componentWillUnmount에서 이벤트 해제하기
+- Render() 이후 한번 호출
+
+### componentDidUpdate()
+
+```react
+componentDidUpdate(prevProps) {
+		const { post } = this.props;
+		if ( prevProps.post !== post ) {
+				this.setCommentList(post);
+		} 
+}
+```
+
+### 클래스형 컴포넌트 작성 순서
+
+1. propTypes 정의
+2. state 초기
+3. render를 제외한 생명주기 메소드 (componentDid ...)
+4. 생명주기를 제외한 메소드
+5. render 메소드
+6. 컴포넌트 외부에서 사용하는 함수 및 변수
+
+
+
