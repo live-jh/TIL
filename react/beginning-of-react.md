@@ -832,3 +832,54 @@ componentDidUpdate(prevProps) {
 
 
 
+## axios 라이브러리
+
+axios는 Promise 기반의 http 클라이언트 요청하는 자바스크립트 라이브러리이며 설치 명령어는 `$ yarn add axios` 입니다.
+
+```react
+function getDetail(id) {
+		axios.get(`http://example.com/post/${id}`)
+			.then(response => {
+					console.log(response);
+			})
+			.catch(error => {
+					console.log(error);
+			})
+}
+
+async function getDetail(id) {
+  	try {
+      	const response = await axios.get(`http://example.com/post/${id}`)
+        console.log(response)
+    } catch (err) {
+      	console.log(err)
+    }
+}
+```
+
+
+
+### Response Schema
+
+- data: 서버 응답 JSON 객체
+- status: 서버 응답 HTTP 상태 코드
+- statusText: 서버 응답 HTTP 상태 메세지
+- headers: 서버 응답 헤더 (소문자)
+- config: 요청시 사용된 axios setting
+- request: 요청 객체
+
+
+
+### Request Setting
+
+- url
+- method
+- baseURL
+- headers
+- params
+- data
+- timeout: default 0
+- auth
+- responseType: json(json, text, stream 등등)
+- etc: onUploadProgress, onDownloadProgress, validateStatus, cancelToken
+
