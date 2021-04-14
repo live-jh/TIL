@@ -883,3 +883,140 @@ async function getDetail(id) {
 - responseType: json(json, text, stream 등등)
 - etc: onUploadProgress, onDownloadProgress, validateStatus, cancelToken
 
+
+
+## 클래스 컴포넌트가 함수형과 비교했을 때 가지는 단점
+
+- 코드 재사용성 및 구성의 어려움
+- 부수적 작성 코드 증가
+- 연관성이 없는 다수 로직을 하나의 생명주기 메소드에 구현해야 하는 점
+- componentDidMount 등록, componentWillUnmount에서 해제 해줘야 하는 단점 
+
+
+
+## 함수형 컴포넌트의 비지니스 로직과 상태값의 차이로 컨테이너 분리하기
+
+### 프레젠테이션 컴포넌트
+
+- 데이터 처리에 관여하지 않음
+- 속성값을 통해 callback 함수 또는 데이터를 인자로 받음 (재사용성)
+- 상태를 속성을 가지지 않음
+
+### 컨테이너 컴포넌트
+
+- 데이터 및 상태값을 제어 및 처리 (Get, Set)
+- Redux로 데이터를 받고 action (dispatch) 실행
+- 데이터 또는 함수들을 프레젠테이션 컴포넌트로 제공
+
+
+
+## React Hook
+
+- 함수형 컴포넌트에서 상태값과 여러 기능 활용 가능
+- 동일한 로직을 한 곳에 모아 가독성이 좋음
+- 클래스형 컴포넌트에서 사용시 커스텀 wrapper 컴포넌트 필요
+
+
+
+### useState Hook은 이전 상태값을 항상 제거 (매번 전체값을 지정해주기)
+
+```react
+const [val1, setVal1] = useState(0);
+const [val2, setVal2] = useState(0);
+const [value, setValue] = useState({val1: 0, val2: 0});
+// const [state, setState] = useState({val1: 0, val2: 0});
+
+const onClick = e => {
+	/* 클릭하는 순간 value 객체는 val2는 사라짐 -> ...prevState로 유지 */ 
+	setValue(prevState => ({...prevState, val1: value.val1 + 2}));
+}
+```
+
+
+
+### useEffect Hook
+
+- 생명주기의 componentDidMount/componentDidUpdate에 대응하는 기능을 합니다.
+- 하나의 컴포넌트에 훅 호출 순서는 일정해야합니다.
+  - 내부적으로 각 훅은 Array에 담겨 처리
+- 함수형 컴포넌트 또는 커스텀 훅 안에서만 호출
+- 최상위 수준(Top level)에서 훅을 호출해야 합니다.
+  - if, for 내에서 호출 불가
+
+
+
+## React Changed State
+
+- setter 함수 제공 -> hook
+- dispatch 함수 제공 -> redux
+  - 객체(object)를 넘기고 dispatch에 대한 type의 key값의 데이터를 문자열로 명시
+  - 해당 type에 대한 payload(데이터)를 전달
+
+
+
+## ContextAPI
+
+리액트 프로젝트에서 전역에서 각 단계별로 속성값을 전달하여 사용할 수 있도록 하는 기능을 말합니다.  Level 4단계가 있을 때 처음 전달해준 이후로 2~3 단계까지 값을 props로 전달하지 않아도 마지막 하위에 컴포넌트에서 사용 가능합니다.
+
+**Provider**를 통해 값을 지정하고 **Consumer** 를 이용해 값을 받아 사용할 수 있습니다.
+
+```react
+const App6 = () => (
+    <MessageContext.Provider value="Provider Values">
+        <Level1 message="ContextAPI in React"/>
+    </MessageContext.Provider>
+)
+
+const Level1 = () => <Level2/>;
+const Level2 = () => <Level3/>;
+const Level3 = () => (
+    <div>
+        <MessageContext.Consumer>
+            {(message) => <>Level3 : {message}</>} 
+        </MessageContext.Consumer>
+    </div>
+);
+// Provider Values
+export default App6;
+```
+
+
+
+### Provider측의 state를 수정하는 함수를 context로 전달하여 호출
+
+```react
+import React, {createContext, useContext, useState} from "react";
+
+const CounterContext = createContext();
+
+const App7 = () => {
+    const [value, setValue] = useState(0);
+    const onIncrement = () => {
+        setValue((prevValue) => prevValue + 1);
+    }
+
+    return (
+        <div>
+            <button onClick={onIncrement}>+1</button>
+            App7 : {value}
+            <CounterContext.Provider value={{value, onIncrement}}>
+                <Level3/> 
+            </CounterContext.Provider>
+        </div>
+    )
+}
+// <Level value={} Increment={}/> => Props 방식
+// Level3 = ({value, Increment}) => Props 방식
+const Level3 = () => {
+    const {value, onIncrement} = useContext(CounterContext)
+    return (
+        <div>
+            <button onClick={onIncrement}>+1</button>
+            Level3: {value}
+        </div>
+    )
+}
+
+
+```
+
