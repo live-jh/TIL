@@ -1020,3 +1020,58 @@ const Level3 = () => {
 
 ```
 
+
+
+## Routing 방식
+
+- 브라우저 라우팅
+
+  - 기본 웹페이지에서 주로 사용되는 방법
+  - <a> 태그를 사용하거나 location.href 속성, 페이지 이동등
+
+- JS에서 라우팅
+
+  - SPA(Single Page Application) 방법
+
+  - 리액트 개발 방식
+
+  - 브라우저 히스토리 API 활용 : react-router-dom
+
+    - `$ yarn add react-router-dom`
+
+      
+
+### Route 설정 컴포넌트가 받는 props
+
+- history : 히스토리 조작
+  - .location, push, goBack, replace
+- location : 현재 경로 정보
+  - pathname, search, state
+- match : Router 매칭
+  - isExact, url, path, params
+
+
+
+### Switch
+
+Switch는 단일 Route만 처리되며 순서대로 매칭을 시도합니다. 또한 path를 지정하지 않을시 모든 path에 매칭됩니다.
+
+
+
+### QueryString
+
+location.search 속성에서 문자열 제공  `$ yarn add query-string`, query-string 라이브러리를 통해 객체 변환 가능 
+
+```
+const ProfilePage = ({location}) => {
+		const {token} = queryString.parse(location.search);
+		
+    return (
+        <div>
+            <h1>ProfilePage</h1>
+            token : {token}
+        </div>
+    )
+}
+```
+

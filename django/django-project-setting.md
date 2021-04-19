@@ -5,7 +5,7 @@
 ### Backend
 
 1. 장고 프로젝트 생성
-   
+  
    1. pycharm으로 new project시 아래 `2번 과정 생략`
    
 2. 가상환경 [anaconda](https://www.anaconda.com/products/individual#Downloads) or [virtualenv](https://live-jh.github.io/posts/dev/django_project_setting/)중 택 1 (anaconda version)
@@ -22,7 +22,8 @@
    1. `$ pip install django~=버전(ex: 3.1.1)` 장고 설치 
    2. `$ which django-admin` (디렉토리 위치 확인)
    3. `$ django-admin startproject 프로젝트명 .`
-      1. pycharm으로 new project시 명령어 생략
+      1. `$python -m django startproject 프로젝트명 ` 과 동일
+      2. pycharm으로 new project시 명령어 생략
    4. 프로젝트 라이브러리 지정 (개발&배포 환경 분리)
       1. requirements/common, requirements/dev, requirements/prod
          1. -r 읽어들일 파일명.파일형식 (-r common.txt)
