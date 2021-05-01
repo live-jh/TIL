@@ -345,6 +345,20 @@ print(result) #[('E', 'I')] permutations는 E,I / I,E
 
 
 
+## 12. python 변수
+
+```python
+a = 1
+b = "python"
+
+print(a)
+print(b)
+```
+
+
+
+
+
 <br>
 
 ## References
