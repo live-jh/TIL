@@ -66,3 +66,24 @@
 ### 현재 사용자 조회
 
 - select current_user;
+
+### 권한 부여
+
+- alter user `유저명` with **superuser**;
+- alter user `유저명` with **createdb**;
+- alter user `유저명` with **createrole**;
+- alter user `유저명` with **replication**;
+- alter user `유저명` with **bypassrls**;
+
+### 외부 접속 허용
+
+/usr/local/var/postgres 이동
+
+- `$ vi postgresql.conf`
+  - listen_addresses = 'localhost' -> '*' 변경
+  - post 주석 해제
+  - `$ pg_ctl -D /usr/local/var/postgres restart`
+- `$ pg_hba.conf`
+  - IPv4 -> host	all	 all	 0.0.0.0/0	 md5 추가
+  - `$ pg_ctl -D /usr/local/var/postgres restart`
+- 
