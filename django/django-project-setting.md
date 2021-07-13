@@ -76,9 +76,12 @@
 
 9. 프로젝트 app 생성 
    1. `python manage.py startapp 앱이름`
+      1. directory settings
+         1. `$ mkdir 앱이름`
+         2. `$ python manage.py startapp 앱이름 ./backend/앱이름`
    2. urls.py 생성 및 urlpatterns 추가
    3. settings에 installed_apps 앱 추가
-
+   
 10. DB 정의 후 Django model 선언
 
 11. Serializers 설정
