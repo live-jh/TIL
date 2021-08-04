@@ -19,25 +19,27 @@
    2. `$ which pip` (디렉토리 위치 확인)
    
 4. 프로젝트 설정
-   1. `$ pip install django~=버전(ex: 3.1.1)` 장고 설치 
    2. `$ which django-admin` (디렉토리 위치 확인)
    3. `$ django-admin startproject 프로젝트명 .`
       1. `$python -m django startproject 프로젝트명 ` 과 동일
       2. pycharm으로 new project시 명령어 생략
-   4. 프로젝트 라이브러리 지정 (개발&배포 환경 분리)
+   3. `$ pip install django~=버전(ex: 3.1.1)` 장고 설치 
+   4. `$ python manage.py migrate`
+   5. `$ python manage.py createsuperuser` superuser 생성
+   6. 프로젝트 라이브러리 지정 (개발&배포 환경 분리)
       1. requirements/common, requirements/dev, requirements/prod
          1. -r 읽어들일 파일명.파일형식 (-r common.txt)
-   5. `$ pip list --format=freeze > requirements.txt`
+   7. `$ pip list --format=freeze > requirements.txt`
       1. requirements 생성(conda는 명령어로 list --format을 추가하기)
       2. virtualenv 가상환경의 경우 `$ pip freeze > requirements.txt`
-   
+
 5. settings.py 설정(dev, prod 분리)
    1. 앱 - config
       1. settings, common, static 등등
       2. common에서 key 관리 (scret_key, aws_key, DB info) 
    2. settings 개발 환경 분리(settings 폴더 생성)
       1. settings/base.py, settings/dev.py, settings/prod.py
-         1. `import *` (안티패턴이지만 settings에서만 예외 적용
+         1. `import *` (안티패턴이지만 settings에서만 예외 적용)
       2. `asgi.py, wsgi.py -> os.environ.setdefault: prod` product 설정
       3. `manage.py -> os.environ.setdefault: dev`
    3. settings.py static 설정 추가
@@ -60,9 +62,19 @@
       2. `'DIRS': [os.path.join(BASE_DIR, 'config', 'templates')]`
          1. templates는 변경 불가
    
-6. DB Migration
+6. 프로젝트 app 생성 
 
-   1. `$ python manage.py migrate`
+   1. `python manage.py startapp 앱이름` (유저)
+      1. directory settings
+         1. `$ mkdir 앱이름`
+         2. `$ python manage.py startapp 앱이름 ./backend/앱이름`
+   2. urls.py 생성 및 urlpatterns 추가
+   3. settings에 installed_apps 앱 추가
+   4. DB 정의 후 Django model 선언
+   5. Serializers 설정
+   6. `$ python manage.py makemigrations`
+   7. `$ python manage.py migrate`
+      1. 쿼리 보기 -> `$ python manage.py sqlmigrate 앱명 마이그레이트 파일명`
 
 7. urls 개발 debug 및 static 분기
    1. setting.DEBUG True일때 path url에 debug_toolbar.urls 및 static url 패턴 추가
@@ -70,31 +82,7 @@
          1. [debug-toolbar-setting-guide](https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#setting-up-urlconf)
       2. static -> `static(media_url='' , document_root='')` 설정
 
-8. superuser 생성
-
-   1. `$ python manage.py createsuperuser`
-
-9. 프로젝트 app 생성 
-   1. `python manage.py startapp 앱이름`
-      1. directory settings
-         1. `$ mkdir 앱이름`
-         2. `$ python manage.py startapp 앱이름 ./backend/앱이름`
-   2. urls.py 생성 및 urlpatterns 추가
-   3. settings에 installed_apps 앱 추가
-   
-10. DB 정의 후 Django model 선언
-
-11. Serializers 설정
-
-12. `$ python manage.py makemigrations`
-
-13. `$ python manage.py migrate`
-
-    1. 쿼리 보기 -> `$ python manage.py sqlmigrate 앱명 마이그레이트 파일명`
-
-14. settings 설정 (debug_toolbar, 개발환경 구성 분리, db설정,  CORS 설정, timezone, root_url, static_url등 수정)
-
-    
+     
 
 
 
@@ -106,9 +94,9 @@
 
 1. frontend 디렉토리 생성 후 이동 `$ mkdir frontend`, `$ cd frontend/`
 2. `$  npm install -g create-react-app # 글로벌로 cra 설치`
-3. `$ create-react-app '앱이름'`
-4. `$ cd 앱이름`
-5. `$ npm start`
+   1. `$ yarn create-react-app 폴더명`
+3. `$ cd 앱이름`
+4. `$ npm start or yarn start` 
 
 
 
