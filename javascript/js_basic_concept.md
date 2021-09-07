@@ -1,0 +1,132 @@
+> 자바스크립트 기본기를 익히기 위한 학습 내용 핵심 정리입니다.
+
+### 실행 컨텍스트(execution-context)
+
+scope, this, hoisting, function closure등 동작 원리를 담고 있는 자바스크립트의 핵심 원리입니다. 실행 가능한 코드를 형상화하고 구분하는 추상적 개념이란 뜻으로 실행 가능한 코드의 필요한 환경의 의미를 담고 있습니다. 실행 가능한 코드는 **함수 코드**, **전역 코드**, **eval 코드**등이 있습니다.
+
+실행 컨텍스트가 생성되면 JS엔진은 실행에 필요한 여러 정보를 담을 객체를 생성합니다. 이를 VO (Variable Object)라 부릅니다. 실행 컨텍스트의 실행은 아래와 같습니다.
+
+- 실행 컨텍스트 스택에 추가
+- 변수 객체(VO) 결정
+- 스코프 체인 생성(전역 스코프 영역인 전역객체와 활성 객체를 순차적 바인딩)
+- this에 바인딩할 객체 결정
+
+### 클로저
+
+정의한 함수가 선언되었을 때 자신을 포함하고 있는 외부함수보다 내부함수가 더 오래 유지되는 경우 (즉, 내부에 함수가 종료되었어도 값을 접근할 수 있는 스코프영역) 지역변수처럼 접근할 수 있는데 이런 함수를 클로저라고 부릅니다.
+
+### 평가
+
+- 코드가 계산(evaluation) 되어 값을 생성하는 것
+  - `ex) const num = 1+1;`
+
+### 일급(first-class)
+
+함수를 다른 변수와 동일하게 다루는 언어에서 사용하는 용어입니다. 생성, 대입, 연산, 인자, 리턴값으로 전달등의 프로그래밍 언어의 기본적 기능에 제한없이 사용할 수 있는 대상을 일컫습니다. 
+
+일급 함수를 가진 언어에서는 함수를 다른 함수의 매개변수, 또는 변수로 활용 가능합니다. 
+
+- 값을 다루는 것
+- 변수에 값을 할당하는 것
+- 함수의 인자 또는 결과로 사용하는 것
+- 리턴값으로 사용하는 것
+
+```javascript
+    const a = 10;
+    const add_50 = a => a + 50; // same (a) => { return a + 50 } 
+    const init = add_50(a);
+    log(init)
+
+    const func_1 = () => { return () => { return 10 } };
+    // const f1 = () => () => 10; // same = () => { return () => { return 10 } }
+    log(func_1()()) // 10
+    const tmp_func_1 = func_1()
+    log(tmp_func_1)
+    log(tmp_func_1()) // 원하는 시점에 평가(함수())해서 결과를 나타냄
+```
+
+### 고차함수
+
+함수를 인자로 전달받거나 함수를 결과 그 자체로 반환하는 함수를 말합니다. 인자로 받은 함수를 필요한 시점에 호출 또는 클로저를 생성하여 반환합니다. 이는 자바스크립트의 함수는 일급 객체이기 때문에 값 그 자체 그대로 인자로 전달할 수 있는 특징에서 비롯됩니다.
+
+고차함수는 크게 2가지 용도로 사용되어집니다.
+
+- 함수를 인자로 받아서 실행
+- 함수를 받아서 리턴
+
+```javascript
+// 클로저란 b => a + b 함수가 a를 계속 기억하고 있는 것을 의미
+// const addMaker = a => b => a + b; // a를 받고 b를 받아 함수를 리턴함
+const addMaker = (a) => {
+  return (b) => { return a + b } //내부에서 함수를 생성해 리턴
+};
+const add10 = addMaker(10); //인자를 숫자값으로 전달
+log(add10(5));
+log(add10(10));
+```
+
+
+
+### function arrow
+
+```javascript
+let cur_date = function () {
+	return new Date()
+}
+
+let cur_date = () => new Date();
+// function 을 ()로
+// return {}를 생략 가능, return이 아닌 것은 {} 생략 불가
+
+let evt = function (x) {
+  return {
+    y: y
+  }
+}
+
+let evt = x => ({ x })
+//객체는 ()를 통해 현재 => 함수 블록이 아닌 객체라는 표기를 해준다.
+```
+
+
+
+### memo
+
+- (매개변수) => { 내용 }
+- 매개변수가 없을 시 ( ) 필수
+- 본문에 return { 내용 } 만 있을 때 { } return 생략 가능
+- return의 값이 객체일때 { } 를 ( ) 로 감싸기
+- 매개변수가 하나일 경우 ( ) 생략 가능
+- 실행컨텍스트 생성시 this 바인딩을 하지 않음
+
+```javascript
+const obj = {
+  a: function () {
+    console.log(this) // obj를 가리킴
+
+    const b = () => {
+      console.log(this)
+    }
+    const c = function () {
+      console.log(this)
+    }
+
+    b() // obj를 가리킴
+    c() // Window 객체
+  }
+}
+obj.a()
+```
+
+### 요약
+
+- `strict mode`가 아닌 경우 브라우저마다 다른 동작이 생기는 이슈가 있다.
+  - ex: `strict mode`에서 함수선언문도 블록스코프에 갇히는 경우
+- ES6 문법을 사용시 함수 선언문을 사용하지 않고 `arrow function` 사용하기
+- 객체: 메소드 축약형
+- 즉 function 키워드가 되도록 등장하지 않도록 코드 작성하기
+
+<br>
+
+## References
+- https://www.inflearn.com/course/ecmascript-6-flow/lecture/12469?tab=curriculum
