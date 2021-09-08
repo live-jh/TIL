@@ -15,6 +15,64 @@ scope, this, hoisting, function closure등 동작 원리를 담고 있는 자바
 
 정의한 함수가 선언되었을 때 자신을 포함하고 있는 외부함수보다 내부함수가 더 오래 유지되는 경우 (즉, 내부에 함수가 종료되었어도 값을 접근할 수 있는 스코프영역) 지역변수처럼 접근할 수 있는데 이런 함수를 클로저라고 부릅니다.
 
+
+
+### function arrow
+
+```javascript
+let cur_date = function () {
+	return new Date()
+}
+
+let cur_date = () => new Date();
+// function 을 ()로
+// return {}를 생략 가능, return이 아닌 것은 {} 생략 불가
+
+let evt = function (x) {
+  return {
+    y: y
+  }
+}
+
+let evt = x => ({ x })
+//객체는 ()를 통해 현재 => 함수 블록이 아닌 객체라는 표기를 해준다.
+```
+
+- (매개변수) => { 내용 }
+- 매개변수가 없을 시 ( ) 필수
+- 본문에 return { 내용 } 만 있을 때 { } return 생략 가능
+- return의 값이 객체일때 { } 를 ( ) 로 감싸기
+- 매개변수가 하나일 경우 ( ) 생략 가능
+- 실행컨텍스트 생성시 this 바인딩을 하지 않음
+
+```javascript
+const obj = {
+  a: function () {
+    console.log(this) // obj를 가리킴
+
+    const b = () => {
+      console.log(this)
+    }
+    const c = function () {
+      console.log(this)
+    }
+    b() // obj를 가리킴
+    c() // Window 객체
+  }
+}
+obj.a()
+```
+
+### 요약
+
+- `strict mode`가 아닌 경우 브라우저마다 다른 동작이 생기는 이슈가 있다.
+  - ex: `strict mode`에서 함수선언문도 블록스코프에 갇히는 경우
+- ES6 문법을 사용시 함수 선언문을 사용하지 않고 `arrow function` 사용하기
+- 객체: 메소드 축약형
+- 즉 function 키워드가 되도록 등장하지 않도록 코드 작성하기
+
+
+
 ### 평가
 
 - 코드가 계산(evaluation) 되어 값을 생성하는 것
@@ -67,75 +125,6 @@ log(add10(10));
 
 
 
-### function arrow
-
-```javascript
-let cur_date = function () {
-	return new Date()
-}
-
-let cur_date = () => new Date();
-// function 을 ()로
-// return {}를 생략 가능, return이 아닌 것은 {} 생략 불가
-
-let evt = function (x) {
-  return {
-    y: y
-  }
-}
-
-let evt = x => ({ x })
-//객체는 ()를 통해 현재 => 함수 블록이 아닌 객체라는 표기를 해준다.
-```
-
-
-
-### memo
-
-- (매개변수) => { 내용 }
-- 매개변수가 없을 시 ( ) 필수
-- 본문에 return { 내용 } 만 있을 때 { } return 생략 가능
-- return의 값이 객체일때 { } 를 ( ) 로 감싸기
-- 매개변수가 하나일 경우 ( ) 생략 가능
-- 실행컨텍스트 생성시 this 바인딩을 하지 않음
-
-```javascript
-const obj = {
-  a: function () {
-    console.log(this) // obj를 가리킴
-
-    const b = () => {
-      console.log(this)
-    }
-    const c = function () {
-      console.log(this)
-    }
-
-    b() // obj를 가리킴
-    c() // Window 객체
-  }
-}
-obj.a()
-```
-
-### 요약
-
-- `strict mode`가 아닌 경우 브라우저마다 다른 동작이 생기는 이슈가 있다.
-  - ex: `strict mode`에서 함수선언문도 블록스코프에 갇히는 경우
-- ES6 문법을 사용시 함수 선언문을 사용하지 않고 `arrow function` 사용하기
-- 객체: 메소드 축약형
-- 즉 function 키워드가 되도록 등장하지 않도록 코드 작성하기
-
-### Iterator
-
-반복기 또는 반복자라는 의미로 시퀀스를 정희하고 종료시 반환값을 잠재적으로 정의하는 객체를 말합니다. **value, done을 반환하는 next() 메소드를 사용**해 객체의 iterator protocol을 구현할 수 있습니다. 시퀀스의 마지막 값이 이미 출력되었으면 done의 값은 true가 되며 value의 값이 done과 함께 존재한다면 반복의 반환값을 의미합니다.
-
-또한 iterable & iterator protocol은 for..of, 전개 연산자등을 대상으로 사용할 수 있도록 정한 규약입니다.
-
-### Iterable 객체
-
-반복 가능한 객체, 즉 배열 객체를 말합니다. for...of 반복문을 적용할 수 있으며 배열은 Symbol.iterator() 메소드를 소유하고 있기에 **배열은 대표적 iterable에 속합니다.** 문자열 역시 iterable이라 말할 수 있으며 목록, 집합등 또한 for..of 문법을 적용할 수 있을때 iterable 객체라 표현합니다. 
-
 ### Array
 
 ```javascript
@@ -149,13 +138,73 @@ log(iter1.next()) //{value: undefined, done: true}
 for (const a of iter1) log(a);
 ```
 
-
-
 ### Set
 
-
+```javascript
+const set = new Set([1, 2, 3]);
+for (const a of set) log(a);
+```
 
 ### Map
+
+```javascript
+const map = new Map([['a', 1], ['b', 2], ['c', 3]]);
+let iter_map = map[Symbol.iterator]();
+console.log(iter_map.next())
+console.log(iter_map.next())
+console.log(iter_map.next()) //value: (2) ["c", 3]
+
+let it = map.values();
+let iter_map_values = it[Symbol.iterator](); // value만 추출
+console.log(iter_map_values.next()) // {value: 1, done: false}
+console.log(iter_map_values.next())
+console.log(iter_map_values.next())
+
+for (const a of map) log(a); // same entries
+for (const a of map.keys()) log(a); // key만 추출
+for (const a of map.entries()) log(a);
+```
+
+
+
+### Iterator
+
+반복기 또는 반복자라는 의미로 시퀀스를 정희하고 종료시 반환값을 잠재적으로 정의하는 객체를 말합니다. **value, done을 반환하는 next() 메소드를 사용**해 객체의 iterator protocol을 구현할 수 있습니다. 시퀀스의 마지막 값이 이미 출력되었으면 done의 값은 true가 되며 value의 값이 done과 함께 존재한다면 반복의 반환값을 의미합니다.
+
+또한 iterable & iterator protocol은 for..of, 전개 연산자등을 대상으로 사용할 수 있도록 정한 규약입니다.
+
+### Iterable 객체
+
+반복 가능한 객체, 즉 배열 객체를 말합니다. for...of 반복문을 적용할 수 있으며 배열은 Symbol.iterator() 메소드를 소유하고 있기에 **배열은 대표적 iterable에 속합니다.** 문자열 역시 iterable이라 말할 수 있으며 목록, 집합등 또한 for..of 문법을 적용할 수 있을때 iterable 객체라 표현합니다. 
+
+잘 구현된 iterable은 iterator를 생성시 iterator를 진행하다 순회하기도 하고 객체 그대로 for문을 활용해 사용할 수 있어야 합니다.
+
+```javascript
+const iterable = {
+  // iterable의 Symbol.iterator 
+  [Symbol.iterator]() {
+    let i = 3;
+    return {
+      // next method
+      next() {
+        // i가 마지막이면 done true
+        return i === 0 ? { done: true } : { value: i--, done: false }
+      },
+      // 존재하지 않을 시 iterator is not iterable
+      [Symbol.iterator]() { return this; } //자기 자신 return 즉 iterator 역시 Symbol.iterator를 가지고 있어야함
+    }
+  }
+}
+let iterator = iterable[Symbol.iterator]();
+// log(iterator.next());
+for (const a of iterator) log(a)
+
+const arr = [1,2,3];
+let iter = arr[Symbol.iterator]();
+console.log(iter[Symbol.iterator]() === iter); // true iterator 실행값이 자기자신
+```
+
+
 
 
 
