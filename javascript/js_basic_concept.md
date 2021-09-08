@@ -126,6 +126,41 @@ obj.a()
 - 객체: 메소드 축약형
 - 즉 function 키워드가 되도록 등장하지 않도록 코드 작성하기
 
+### Iterator
+
+반복기 또는 반복자라는 의미로 시퀀스를 정희하고 종료시 반환값을 잠재적으로 정의하는 객체를 말합니다. **value, done을 반환하는 next() 메소드를 사용**해 객체의 iterator protocol을 구현할 수 있습니다. 시퀀스의 마지막 값이 이미 출력되었으면 done의 값은 true가 되며 value의 값이 done과 함께 존재한다면 반복의 반환값을 의미합니다.
+
+또한 iterable & iterator protocol은 for..of, 전개 연산자등을 대상으로 사용할 수 있도록 정한 규약입니다.
+
+### Iterable 객체
+
+반복 가능한 객체, 즉 배열 객체를 말합니다. for...of 반복문을 적용할 수 있으며 배열은 Symbol.iterator() 메소드를 소유하고 있기에 **배열은 대표적 iterable에 속합니다.** 문자열 역시 iterable이라 말할 수 있으며 목록, 집합등 또한 for..of 문법을 적용할 수 있을때 iterable 객체라 표현합니다. 
+
+### Array
+
+```javascript
+log('Arr -----------');
+const arr = [1, 2, 3];
+let iter1 = arr[Symbol.iterator]();
+log(iter1.next()) //{value: 1, done: false}
+log(iter1.next()) //{value: 2, done: false}
+log(iter1.next()) //{value: 3, done: false}
+log(iter1.next()) //{value: undefined, done: true}
+for (const a of iter1) log(a);
+```
+
+
+
+### Set
+
+
+
+### Map
+
+
+
+
+
 <br>
 
 ## References
