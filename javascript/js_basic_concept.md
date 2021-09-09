@@ -145,7 +145,7 @@ const set = new Set([1, 2, 3]);
 for (const a of set) log(a);
 ```
 
-### Map
+### Map(순회)
 
 ```javascript
 const map = new Map([['a', 1], ['b', 2], ['c', 3]]);
@@ -163,6 +163,49 @@ console.log(iter_map_values.next())
 for (const a of map) log(a); // same entries
 for (const a of map.keys()) log(a); // key만 추출
 for (const a of map.entries()) log(a);
+
+// 기존 map
+const demo_map = products.map(elem => elem.name)
+
+// custom map
+const map = (f, iter) => { //f -> 함수를 받아 함수내에서 조건 처리
+  let res = []
+  for (const it of iter) { // iterator이며 곧 => iter[Symbol.iterator]()
+    res.push(f(it)); // 함수에게 값을 위임
+  }
+  return res;
+}
+
+```
+
+### Map의 다형성
+
+```javascript
+const map = (f, iter) => { //f -> 함수를 받아 함수내에서 조건 처리
+  let res = []
+  for (const it of iter) { // iterator이며 곧 => iter[Symbol.iterator]()
+    res.push(f(it)); // 함수에게 값을 위임
+  }
+  return res;
+}
+
+// 다형성 실제 querySelectorAll('*')이 map을 가지고 있지 않지만 custom을 통해 구현 가능
+log(map(el => el.nodeName, document.querySelectorAll('*'))) //querySelectorAll('*')가 iterable 프로토콜을 따르는 것을 의미
+
+
+const it = document.querySelectorAll('*')[Symbol.iterator]();
+log(it.next());
+log(it.next());
+log(it.next());
+
+//generator 함수
+function* gen() {
+  yield 1;
+  if (false) yield 2;
+  yield 3;
+}
+// iterable 프로토콜을 따르는 함수를 사용하는 것은 다른 많은 헬퍼 함수들과의 조합이 다양해지는 것을 의미한다.
+log(map(e => e * e, gen()))
 ```
 
 
@@ -202,6 +245,73 @@ for (const a of iterator) log(a)
 const arr = [1,2,3];
 let iter = arr[Symbol.iterator]();
 console.log(iter[Symbol.iterator]() === iter); // true iterator 실행값이 자기자신
+```
+
+
+
+### Filter (조건)
+
+```javascript
+// 중복 제거 또는 조건 걸기
+const filter = (f, iter) => {
+  let res = []
+  for (const it of iter) {
+    if (f(it)) res.push(it);
+  }
+	return res;
+}
+
+log(filter(p => p.price < 20000, products))
+
+let under20000 = [];
+for (const p of products) {
+	if (p.price < 20000) under20000.push(p);
+}
+log([...under20000]); // filter(p => p.price < 20000, products)과 동일
+
+let over20000 = [];
+for (const p of products) {
+	if (p.price > 15000) over20000.push(p);
+}
+log([...over20000]);
+log(filter(p => p.price > 15000, products))
+
+log(filter(n => n % 2, function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+  yield 4;
+}())) // generator 즉시 실행 함수
+//1, 3
+```
+
+
+
+### Reduce (모든 값을 구할 때 array가 아닌 하나의 값)
+
+```javascript
+const nums = [1, 2, 3, 4, 5];
+
+// let total = 0;
+// for (const n of nums) {
+//     total = total + n;
+// }
+// log(total);
+
+const add = (a, b) => a + b;
+const reduce = (f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator](); //인자로 보낸 acc에 iterator로 할당
+    acc = iter.next().value;       //iterator의 첫번째 요소를 acc로 할당
+  }
+  for (const it of iter) {
+    acc = f(acc, it); // func 안에 2개 인자 보내기 (add)
+  }
+  return acc; //acc 누적값
+}
+
+log(reduce(add, nums)) // 도전
+log(reduce(add, 0, nums)) // add(add(add(0, 1), 2), 3) 의미 
 ```
 
 
