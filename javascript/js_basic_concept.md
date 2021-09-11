@@ -316,6 +316,34 @@ log(reduce(add, 0, nums)) // add(add(add(0, 1), 2), 3) 의미
 
 
 
+### 함수 중첩시 효율적인 go와 pipe 함수
+
+```javascript
+const go = (...args) => reduce((a, f) => f(a), args); // (f(a)[연산], args[iter])
+go(
+    add(0, 1),
+    a => a + 1,
+    a => a + 10,
+    log
+)
+
+const pipe = (f, ...funcs) => (...as) => {
+        log(...as) // func의 파라미터
+        log(f) // pipe의 첫번째 인자
+        log(funcs) // pipe의 2,3번째 인자
+        return go(f(...as), ...funcs)
+    };
+
+const func = pipe(
+        (a, b) => a + b, // go add(0, 1)과 같은 의미 (인자 2개 이상)
+        a => a + 1,
+        a => a + 10,
+    )
+log(func(0, 1))
+```
+
+
+
 
 
 
