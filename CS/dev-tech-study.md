@@ -344,13 +344,23 @@ get은 가져오는 것이고 post는 수행하는 개념입니다. get은 selec
 - nginx, tomcat
 - was와 웹서버 차이
 
+<br>
+
 ### DNS
 
 인터넷 표준 프로토콜은 TCP/IP입니다. 이 프로토콜을 사용하는 네트워크 안에서 host를 식별하기 위한 목적으로 IP주소를 사용합니다. 길게 숫자로 이루어진 IP 주소를 사람이 읽기 편한 주소 이름으로 변환한 것을 말합니다. 대표적으로 DNS 서비스는 aws의 route 53이 해당됩니다.
 
+<br>
+
 ### Authentication
 
+- 
+
 ### XSS
+
+- 
+
+<br>
 
 ### 캐시 메모리
 
@@ -358,10 +368,16 @@ get은 가져오는 것이고 post는 수행하는 개념입니다. get은 selec
 
 ### OOP
 
+- 
+
+<br>
+
 ### TDD
 
 - 테스트의 필요성
 - 종류 (단위, 통합까지)
+
+<br>
 
 ### DB Key
 
@@ -370,13 +386,25 @@ get은 가져오는 것이고 post는 수행하는 개념입니다. get은 selec
 - PK : 기본키, not null, unique
 - FK : 외래키, 다른 릴레이션의 PK(기본키)를 그대로 속성으로 참조하는 키
 
+<br>
+
 ### DB 정규화
+
+- 
+
+<br>
 
 ### 트랜잭션
 
 - 트랜잭션시 주의점
 
+<br>
+
 ### 트랜잭션 ACID
+
+- 
+
+<br>
 
 ### DB Index
 
@@ -407,19 +435,27 @@ get은 가져오는 것이고 post는 수행하는 개념입니다. get은 selec
 
 ### CSRF
 
+<br>
+
 ### CORS
 
-### DB를 사용하는 이유
+<br>
 
 ### SPA
 
-### middleware
+<br>
 
 ### SSR
 
+<br>
+
 ### CSR
 
+<br>
+
 ### CI/CD
+
+<br>
 
 ### Master DB
 
@@ -445,72 +481,4 @@ get은 가져오는 것이고 post는 수행하는 개념입니다. get은 selec
 ### 함수형프로그래밍
 
 <br>
-
-## Python Django
-
-### 스케줄링 알고리즘
-
-### 클래스 상속 및 메소드 실행방식
-
-### GIL
-
-### GIL 왜 성능문제가 발생하는지
-
-### GC는 어떻게 작동하는지
-
-### Celery란? 사용 유무
-
-### 웹서비스 응답이 느릴때 해결 방안
-
-### python 메모리 릭이 발생하는 경우
-
-### Decorator?
-
-### Generator
-
-### 로그인 인증
-
-### JWT
-
-### JWT 변조 공격 대처
-
-### Bcrypt 작동 원리 
-
-### 유닛 테스트, 통합 테스트 경험 유무
-
-<br>
-
-## Python Data Structure
-
-### List
-
-- 
-
-### Duple
-
-- 
-
-### Dictionary
-
-- 
-
-### Set
-
-- 
-
-### Stack
-
-- 
-
-### Queue
-
-- 
-
-### Map
-
-- 
-
-### Hash
-
-- 
 
