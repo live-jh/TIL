@@ -319,30 +319,104 @@ log(reduce(add, 0, nums)) // add(add(add(0, 1), 2), 3) 의미
 ### 함수 중첩시 효율적인 go와 pipe 함수
 
 ```javascript
-const go = (...args) => reduce((a, f) => f(a), args); // (f(a)[연산], args[iter])
-go(
-    add(0, 1),
-    a => a + 1,
-    a => a + 10,
-    log
-)
+    // reduce (합치기), a는 0, f는 함수, reduce엔 앞에 연산, 뒤에 함수를 넣는다
+    const go = (...args) => reduce((a, f) => f(a), args); // (f(a)[연산], args[iter])
+    go(
+        add(0, 1),
+        a => a + 1,
+        a => a + 10,
+        log
+    )
 
-const pipe = (f, ...funcs) => (...as) => {
+    // 내부에 전달받은 여러 함수를 이용해 결과값(함수)을 축약, 함수 리턴
+    // a 인자를 받아 go 함수를 호출하는데 인자 받은 함수를 그대로 넘겨준다
+    // a 인자는 pipe의 첫번째 인자이다
+    const pipe = (f, ...funcs) => (...as) => {
         log(...as) // func의 파라미터
         log(f) // pipe의 첫번째 인자
         log(funcs) // pipe의 2,3번째 인자
         return go(f(...as), ...funcs)
     };
 
-const func = pipe(
+    const func = pipe(
         (a, b) => a + b, // go add(0, 1)과 같은 의미 (인자 2개 이상)
         a => a + 1,
         a => a + 10,
     )
-log(func(0, 1))
+    log(func(0, 1))
+
 ```
 
 
+
+
+
+### Callback
+
+javascript에서 콜백함수란 어떤 함수를 실행할때 다른 함수를 인자로 전달하여 실행함수의 이벤트가 발생 후 인자로 전달된 함수를 호출하는 것을 말합니다.
+
+**why Callback?**
+
+- 자바스크립트는 비동기 처리방식을 지원하기 때문에 특정 시점에 호출이 되는 콜백함수를 사용함으로써 비동기 처리의 문제점을 해결할 수 있기 때문
+
+### Promise
+
+프로미스는 비동기 작업이 완료, 실패등을 효율적으로 결과값을 나타낼 수 있도록 사용되는 객체입니다. 이때 비동기란 특정 코드의 작성 순서에 따른 실행 완료를 기다리지 않고 다음 코드가 먼저 실행되는 것을 의미하며 위에 Callback 함수를 사용시 callback 함수를 인자로 보내줘야 하는 것과 달리 resolve(), then()과 같은 내장 함수를 이용해 비동기처리를 할 수 있습니다. ㅂ
+
+**Callback & Promise what's the difference?**
+
+then() 함수를 통해 보다 보기 쉽고 사용하기 간편하며 코드의 양에 줄어드는 차이가 아닌 **비동기 상황에서 일급값으로 처리한다는 점** 이 가장 큰 차이점입니다. Promise는 Promise클래스를 통해 만들어진 인스턴스를 반환하며 해당 인스턴스는 **대기**, **성공**, **실패**에 대한 상태를 가지고 있는데 이는 **일급값**으로 구성되어 있습니다. (일급 위에 참조)
+
+
+
+### Monad
+
+모나드는 비동기 값을 가지고 함수형 프로그래밍(연속적인 함수 호출 및 합성)을  하는 것을 의미합니다. 프로그래밍하면서 기대하는 값이 원치 않는 값이 나올 수도 있기에 함수를 합성시 안정성을 고려하는 것을 말하며 undefined, NaN등의 값들을 유연히 대응할 수 있습니다.
+
+```javascript
+  const g = a => a + 1;
+  const f = a => a * 2;
+	
+	[1].map(g).map(f).forEach(r => log(r));
+
+	// promise
+  Promise.resolve(1).then(g).then(f).then(r => log(r)) // same [1].map(g).map(f).forEach(r => log(r))
+```
+
+### kleisli composition
+
+특정한 규칙을 통해 안전한 함수 합성을 만들고 수학적인 접근 즉, `A = B` A와 B는 같다라는 개념을 도입한 것을 말합니다. `ex) f(g(x)) = g(f(x))`
+
+```javascript
+	 let users = [
+        { id: 1, name: 'aa' },
+        { id: 2, name: 'bb' },
+        { id: 3, name: 'cc' }
+   ];
+
+   //유저를 id 찾는 함수
+   const getUserById = id => find(u => u.id == id, users) || Promise.reject("not exists");
+
+   const f = ({ name }) => name; // "항상" 객체내에 name을 추출해서 return
+   const g = getUserById; // 유저 찾는 id 함수
+
+   // const fg = id => f(g(id));
+   const fg = id => Promise.resolve(id).then(g).then(f);
+
+   fg(2).then(log);
+```
+
+![image](https://user-images.githubusercontent.com/48043799/133189042-b4fce5ff-4e9a-4840-8d64-70eb402c0154.png)
+
+### Promise.then의 규칙
+
+여러 Promise가 중첩되어 있어도 단 1번의 then으로 내가 원하는 결과를 꺼내어 사용할 수 있습니다. 
+
+```javascript
+Promise.resolve(Promise.resolve(Promise.resolve(1))).then(log); //1
+
+new Promise(resolve => resolve(new Promise(resolve => resolve(1)))).then(log); // 1
+```
 
 
 
@@ -352,3 +426,4 @@ log(func(0, 1))
 
 ## References
 - https://www.inflearn.com/course/ecmascript-6-flow/lecture/12469?tab=curriculum
+- https://www.inflearn.com/course/functional-es6/
