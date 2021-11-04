@@ -390,7 +390,7 @@ bootstrap-pagination 기능 활용
 
 ## 장식자 (Decorator)
 
-어떤 함수를 감싸는 (wrapping) 함수 (자바의 어노테이션 표기와 같다) 
+어떤 함수를 감싸는 (wrapping) 함수를 말하며 추가적으로 꾸며질 구문을 정의해 재사용하는 것을 의미합니다. (자바의 어노테이션 표기와 같다)
 
 ```python
 @login_required #함수

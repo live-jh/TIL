@@ -675,6 +675,8 @@ Create시 추가로 DB 반영(저장, 수정, 삭제)
 
 유입되는 요청에 대해 **허용/거부** 하는 것이 아니라 **단순 인증 정보로 유저를 식별**하는 것
 
+예를 들어 아이디와 비밀번호로 로그인하는 것을 말합니다.
+
 - Authentication: 유저 식별
 - Permissions: 각 요청에 대한 허용/거부
 - Throttling: 일정 기간 허용 최대 횟수
@@ -731,12 +733,34 @@ User 모델과 1:1 관계이며 각 User별 토큰을 수동 생성해야 합니
 - DjangoModelPermissionsOrAnonReadOnly: DjangoModelPermissions에 비인증 요청엔 읽기만 허용
 - DjangoObjectPermissions: 비인증 요청은 거부, 인증 요청엔 Object 권한 체크
 
+### @api_view 지정
+
+```python
+class PostView(APIView):
+		permissions_classes = [IsAuthenticated]
+		
+		def get(self,request):
+				pass
+```
+
+### APIView 지정
+
+```python
+@api_view(['GET'])
+@permissions_classes([IsAuthenticated])
+def post_view(self,request):
+		pass
+```
+
+
+
 ### Default global setting
 
 ```python
 REST_FRAMEWORK = {
 		'DEFAULT_PERMISSION_CLASSES': [
 				'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
 		]
 }
 ```
@@ -762,6 +786,37 @@ PUT, DELETE는 저자와 유저가 같아야 허용
 - get : get 요청
 - head : 실제 응답 head만 받아보는 기능
 - options : 엔드포인트에서 어떤 메소드를 지원하는지 알려주는 인터페이스
+
+```python
+class AllowAny(BasePermission):
+   def has_permission(self, request, view):
+       return True
+      
+class IsAuthenticated(BasePermission): # 인증된 요청에 한해 허가
+   def has_permission(self, request, view):
+       return request.user and request.user.is_authenticated
+      
+class IsAdminUser(BasePermission): # 관리자만 허가
+   def has_permission(self, request, view):
+       return request.user and request.user.is_staff
+```
+
+
+
+```python
+class IsAuthorOrReadOnly(permissions.BasePermission):
+   # 인증된 유저에 한해, 목록조회/포스팅등록 허용
+   def has_permission(self, request, view):
+       return request.user.is_authenticated
+   
+   # 작성자에 한해 레코드에 대한 수정/삭제 허용
+   def has_object_permission(self, request, view, obj):
+       # 조회 요청(GET, HEAD, OPTIONS) 에 대해 인증여부 상관없이 허용
+       if request.method in permissions.SAFE_METHODS:
+          return True
+       # PUT, DELETE 요청에 대해 작성자일 경우 요청 허용
+       return obj.author == request.user
+```
 
 
 

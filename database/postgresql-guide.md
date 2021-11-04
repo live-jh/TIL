@@ -10,6 +10,10 @@
 - `$ pg_ctl -D /usr/local/var/postgres stop`
 - `$ pg_ctl -D /usr/local/var/postgres stop && brew services stop postgresql` 
 
+### 접속
+
+- psql postgres (default super user)
+
 ### 테이블 삭제
 
 - dropdb 테이블명

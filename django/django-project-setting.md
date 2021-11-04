@@ -130,6 +130,104 @@ $ pip install -r requirements.txt
 
 
 
+
+
+## Ver.2
+
+### prod에선 conda보단 pip로 사용(가상환경)
+
+1. 프로젝트 설정 (이름은 _ 불가, 카멜 or - 규칙 사용하기)
+
+2. anaconda python 3.8 (virtual environments 가상환경)
+
+3. 앱 이름 -> config로 변경
+
+4. 1. settings 또는 프로젝트 앱이름 사용된 곳 다 config로 변경
+
+5. common/env_file 붙여넣기
+
+6. settings 수정
+
+7. 1. language code
+
+   2. timezone
+
+   3. env_json = join(BASE_DIR, 'config/common/env.json')
+
+   4. add with open(env_file)
+
+   5. SECRET_KEY 설정
+
+   6. 1. get_secret(key)
+
+   7. DATABASES
+
+8. add .gitignore 
+
+9. default migrate
+
+10. create superuser
+
+11. admin, localhost 8000 잘 뜨는지 확인
+
+12. requirements.txt 생성
+
+13. 1. Django~=version
+
+14. add static_url, root in settings 
+
+15. 1. STATIC_URL, STATIC_ROOT
+    2. MEDIA_URL, MEDIA_ROOT
+
+16. modified urls.py 
+
+17. 1. static root 서빙 설정
+
+18. requirements 디렉토리 구분
+
+19. 1. common, dev, prod
+    2. django-debug-toolbar 설치
+
+20. urlpatterns debug 추가
+
+21. settings 구분
+
+22. 1. common, dev, prod
+
+    2. 1. dev -> installed_apps += django_debug_toolbar, MIDDLEWARE += debugtoolbar
+       2. INTERNAL_IPS = ’127.0.0.1’ 추가
+
+    3. wsgi -> 서비스의 진입점 config.settings.prod
+
+    4. asgi -> 
+
+    5. manage -> 개발 환경의 진입점 config.settings.dev
+
+    6. 환경설정 -> config.settings.dev
+
+    7. BASE_DIR depth 하나 더 추가
+
+23. frontend 사용 안하는거 제거
+
+24. 1. App.js
+
+    2. App.test.js
+
+    3. app.scss (변경)
+
+    4. 1. CRA 로 생성된 리액트는 4버전 이후와 충돌남(아래와 같이 설정)
+       2. $ yarn add node-sass@4.14.0
+
+    5. index.scss (변경)
+
+    6. index.js
+
+    7. setupTests 
+
+    8. 외 다 제거
+
+    9. 지운 목록들 다 확인해서 코드도 제거
+
 ## Reference
 
 - https://blog.hannal.com/2015/04/start_with_django_webframework_06/
